@@ -1,0 +1,22 @@
+{
+  "name": "coupon",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js",
+    "build": "next build",
+    "start": "NODE_ENV=production node server.js",
+    "export": "next export"
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "jquery": "^3.6.4",
+    "next": "13.2.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-hot-toast": "^2.4.0",
+    "react-paginate": "^8.1.4",
+    "react-slick": "^0.29.0",
+    "slick-carousel": "^1.8.1"
+  }
+}
