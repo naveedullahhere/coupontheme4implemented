@@ -74,7 +74,7 @@ export default function Home({ data, setMetas, metas }) {
     return (
       <>
         <Slider data={data} sliderData={homeData} />
-        <CategoryWiseBlog />    
+        <CategoryWiseBlog data={data} />
         {data.Style === 2 && <Subscribe data={data} />}
 
         {data.Style === 1 ||
@@ -91,7 +91,7 @@ export default function Home({ data, setMetas, metas }) {
           </>
         )}
 
-        <Favorite styledata={data} />
+        {data.Style !== 4 ? <Favorite styledata={data} /> : ""}
       </>
     );
   }

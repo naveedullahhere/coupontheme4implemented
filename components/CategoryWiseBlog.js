@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -7,89 +7,191 @@ import {
 } from "@/public/settings/there_is_nothing_holding_me_back/config";
 import Spinner from "./Spinner";
 
-const CategoryWiseBlog = () => {
+const CategoryWiseBlog = ({ data = null }) => {
   const [blogs, setBlogs] = useState([]);
   const [imageBaseUrl, setImageBaseUrl] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchBlogs = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(
+        `${APP_URL}api/v1/blogs?key=${APP_KEY}&type=featured`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setBlogs(result?.data || []);
+      setImageBaseUrl(result?.url || "");
+    } catch (err) {
+      console.error("Error fetching blogs:", err);
+      setError("Failed to load blogs. Please try again later.");
+      setBlogs([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    setLoading(true);
+    fetchBlogs();
+  }, [fetchBlogs]);
 
-    fetch(`${APP_URL}api/v1/blogs?key=${APP_KEY}&type=featured`)
-      .then((res) => res.json())
-      .then((response) => {
-        setBlogs(response?.data || []);
-        setImageBaseUrl(response?.url || "");
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
+  // Blog Card Component for reusability
+  const BlogCard = ({ blog, isStyle4 = false }) => {
+    const imageUrl = blog.image
+      ? `${imageBaseUrl}/${blog.image}`
+      : "/assets/no-image.jpg";
+
+    const formattedDate = blog.created_at
+      ? new Date(blog.created_at).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
+      : "N/A";
+
+    if (isStyle4) {
+      return (
+        <div className="col-lg-4 col-md-6 mb-4">
+          <div className="card h-100 border-0 rounded-0 shadow-hover">
+            <div
+              className="position-relative overflow-hidden"
+              style={{ height: "250px" }}
+            >
+              <Image
+                src={imageUrl}
+                alt={blog.title}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="card-img-top rounded-0 object-fit-cover"
+                priority={false}
+              />
+            </div>
+
+            <div className="card-body d-flex flex-column p-4">
+              <h3 className="card-title fw-bold fs-5 mb-3 text-dark">
+                {blog.title}
+              </h3>
+
+              <div className="flex-grow-1 mb-3">
+                <div
+                  className="text-dark lh-base fs-6"
+                  style={{
+                    fontWeight: 500,
+                    lineHeight: 1.6,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                  dangerouslySetInnerHTML={{ __html: blog.short_description }}
+                />
+              </div>
+
+              <div className="d-flex align-items-center justify-content-between pt-3 border-top">
+                <span className="text-muted small">{formattedDate}</span>
+                <Link
+                  href={`/blog/${blog.slug}`}
+                  className="text-decoration-none fw-bold text-dark small"
+                >
+                  Read More →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Default Style
+    return (
+      <div className="col-md-4 mb-4">
+        <div className="card h-100 rounded-0 border shadow-sm">
+          <div className="position-relative" style={{ height: "200px" }}>
+            <Image
+              src={imageUrl}
+              alt={blog.title}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="card-img-top object-fit-cover"
+              priority={false}
+            />
+          </div>
+
+          <div className="card-body d-flex flex-column">
+            <h5 className="card-title fw-bold mb-3">{blog.title}</h5>
+
+            <div className="flex-grow-1 mb-3">
+              <div
+                className="text-muted"
+                style={{
+                  display: "-webkit-box",
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                }}
+                dangerouslySetInnerHTML={{ __html: blog.short_description }}
+              />
+            </div>
+
+            <div className="d-flex align-items-center justify-content-between mt-auto">
+              <span className="text-muted small">{formattedDate}</span>
+              <Link
+                href={`/blog/${blog.slug}`}
+                className="btn btn-primary btn-sm rounded-0"
+              >
+                Read More
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
-      <div className="bg-white vh-100 vw-100 d-flex justify-content-center align-items-center position-fixed top-0 start-0 z-1">
+      <div className="min-vh-50 d-flex justify-content-center align-items-center">
         <Spinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container-fluid my-5">
+        <div className="alert alert-danger text-center" role="alert">
+          {error}
+          <button onClick={fetchBlogs} className="btn btn-link p-0 ms-2">
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (blogs.length === 0) {
+    return (
+      <div className="container-fluid my-5">
+        <div className="text-center py-5">
+          <p className="text-muted fs-5">No blogs found</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="container-fluid my-5">
-      {/* <h3 className="head1 pt-5 mb-4">Category Wise Blog</h3> */}
-
-      <div className="row">
-        {blogs.length > 0 ? (
-          blogs.map((blog) => (
-            <div className="col-md-4 mb-3" key={blog.id}>
-              <div className="card h-100 rounded-0 border-0">
-                <Image
-                  src={
-                    blog.image
-                      ? `${imageBaseUrl}/${blog.image}`
-                      : "/assets/no-image.jpg"
-                  }
-                  alt={blog.title}
-                  width={100}
-                  height={200}
-                  className="card-img-top"
-                />
-
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title blog-title-theme-4">
-                    {blog.title}
-                  </h5>
-
-                  {/* ✅ Truncated description */}
-                  <p className="card-text blog-description-theme-4">
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: blog.short_description,
-                      }}
-                    />
-                  </p>
-
-                  <div className="card-footer bg-white align-items-center p-0 bg-transparent border-0 d-flex justify-content-between">
-                    <p className="card-text text-muted m-0">
-                      Published on:{" "}
-                      {blog.created_at
-                        ? new Date(blog.created_at).toLocaleDateString()
-                        : "N/A"}
-                    </p>
-
-                    <Link
-                      href={`/blog/${blog.slug}`}
-                      className="btn btn-primary m-0"
-                    >
-                      Read More
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-center">No blogs found</p>
-        )}
+      <div className="row g-4">
+        {blogs.map((blog) => (
+          <BlogCard key={blog.id} blog={blog} isStyle4={data?.Style == 4} />
+        ))}
       </div>
     </div>
   );

@@ -189,7 +189,11 @@ const Header2 = ({ data, category, season, coupons, country }) => {
                   ))}
                 </ul>
               </li>
-
+              <li className="nav-item">
+                <Link className="nav-link" href="/blogs">
+                  Blogs
+                </Link>
+              </li>
               <li className="nav-item memorial-btn">
                 <Link
                   href={data?.header?.button_url}
