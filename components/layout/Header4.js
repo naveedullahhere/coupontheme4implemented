@@ -187,69 +187,13 @@ const Header2 = ({ data, category, season, coupons, country }) => {
                   </li>
                 </ul>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link" href="/all-stores">
-                  All Stores
-                </Link>
-              </li>
-              <li className="nav-item dropdown">
-                <Link href="/category" className="nav-link dropdown-toggle">
-                  Category
-                </Link>
-                <ul className="dropdown-menu rounded-0">
-                  {category?.slice(0, 10).map((cat) => (
-                    <li key={cat.slug}>
-                      <Link
-                        className="dropdown-item"
-                        href={`/category/${cat.slug}`}
-                      >
-                        {cat.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-
-              <li className="nav-item dropdown">
-                <Link className="nav-link dropdown-toggle" href="#">
-                  Coupon
-                </Link>
-                <ul className="dropdown-menu rounded-0">
-                  {coupons?.slice(0, 10).map((c) => (
-                    <li key={c.slug}>
-                      <Link
-                        className="dropdown-item"
-                        href={`/coupon/${c.slug}`}
-                      >
-                        {c.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-
-              <li className="nav-item dropdown">
-                <Link className="nav-link dropdown-toggle" href="#">
-                  Seasons
-                </Link>
-                <ul className="dropdown-menu rounded-0">
-                  {season?.slice(0, 10).map((s) => (
-                    <li key={s.slug}>
-                      <Link
-                        className="dropdown-item"
-                        href={`/season/${s.slug}`}
-                      >
-                        {s.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-              <li className="nav-item">
+             
+           
+              {/* <li className="nav-item">
                 <Link className="nav-link" href="/blogs">
                   Blogs
                 </Link>
-              </li>
+              </li> */}
               {/* <li className="nav-item memorial-btn">
                 <Link
                   href={data?.header?.button_url}
