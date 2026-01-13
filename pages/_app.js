@@ -17,6 +17,7 @@ import {
 import Spinner from "@/components/Spinner";
 import { toast } from "react-hot-toast";
 import Header4 from "@/components/layout/Header4";
+import Footer4 from "@/components/layout/Footer4";
 
 const Toaster = dynamic(
   () => import("react-hot-toast").then((c) => c.Toaster),
@@ -120,7 +121,6 @@ export default function App({ Component, pageProps }) {
               country={country}
             />
           )}
-
           {data.Style === 2 && (
             <Header2
               data={data}
@@ -130,7 +130,6 @@ export default function App({ Component, pageProps }) {
               country={country}
             />
           )}
-
           {data.Style === 4 && (
             <Header4
               data={data}
@@ -140,7 +139,6 @@ export default function App({ Component, pageProps }) {
               country={country}
             />
           )}
-
           <div className={`min-vh-90`}>
             <Component
               {...pageProps}
@@ -150,7 +148,7 @@ export default function App({ Component, pageProps }) {
             />
           </div>
           <Toaster position="top-right" />
-          {data.Style === 1 ? (
+          {data.Style === 1 && (
             <Footer1
               data={data}
               category={category}
@@ -158,8 +156,18 @@ export default function App({ Component, pageProps }) {
               coupons={coupons}
               country={country}
             />
-          ) : (
+          )}
+          {data.Style === 2 && (
             <Footer2
+              data={data}
+              category={category}
+              season={season}
+              coupons={coupons}
+              country={country}
+            />
+          )}
+          {data.Style === 4 && (
+            <Footer4
               data={data}
               category={category}
               season={season}
