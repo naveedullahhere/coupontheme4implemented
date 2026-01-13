@@ -1,3 +1,60 @@
+/* ----------------- First Level Dropdown ----------------- */
+.navbar-nav .dropdown:hover > .dropdown-menu {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}
+
+/* ----------------- Nested Dropdowns ----------------- */
+.dropdown-menu .dropdown:hover > .dropdown-menu {
+  display: block;
+  left: 100%;       /* Show to the right */
+  top: 0;           /* Align top */
+  margin-top: 0;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
+
+/* Hide all dropdowns by default */
+.dropdown-menu .dropdown-menu {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 100%;
+}
+
+/* Optional: smooth hover effect on items */
+.dropdown-menu li a {
+  padding: 0.5rem 1rem;
+  transition: background 0.2s;
+}
+
+.dropdown-menu li a:hover {
+  background-color: #f8f9fa;
+}
+
+/* Rotate caret on hover */
+.dropdown-toggle::after {
+  transition: transform 0.3s;
+}
+
+.dropdown:hover > .dropdown-toggle::after {
+  transform: rotate(180deg);
+}
+
+/* Ensure dropdown is above everything */
+.dropdown-menu {
+  z-index: 1000;
+}
+
+
+
 * {
   box-sizing: border-box;
   padding: 0;

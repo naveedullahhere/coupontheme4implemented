@@ -165,7 +165,7 @@ const Header2 = ({ data, category, season, coupons, country }) => {
                       All Stores
                     </Link>
                   </li>
-                  <li className="">
+                  <li className="dropdown">
                     <Link
                       className="nav-link nav-item dropdown-toggle"
                       href="/all-stores"
@@ -183,7 +183,7 @@ const Header2 = ({ data, category, season, coupons, country }) => {
                           </Link>
                         </li>
                       ))}
-                    </ul>
+                    </ul> 
                   </li>
                 </ul>
               </li>

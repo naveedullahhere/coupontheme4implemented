@@ -74,7 +74,8 @@ export default function Home({ data, setMetas, metas }) {
     return (
       <>
         <Slider data={data} sliderData={homeData} />
-        <CategoryWiseBlog data={data} />
+        {data.Style === 4 && <CategoryWiseBlog data={data} />}
+
         {data.Style === 2 && <Subscribe data={data} />}
 
         {data.Style === 1 ||
