@@ -130,32 +130,32 @@ const Header2 = ({ data, category, season, coupons, country }) => {
             id="mainMenu"
           >
             <ul className="navbar-nav nav-css">
-              <li className="nav-item">
+              <li className="nav-item px-3">
                 <Link className="nav-link" href="/all-stores">
                   Life Style
                 </Link>
               </li>
-              <li className="nav-item">
+              <li className="nav-item px-3">
                 <Link className="nav-link" href="/all-stores">
                   Clothing
                 </Link>
               </li>
-              <li className="nav-item">
+              <li className="nav-item px-3">
                 <Link className="nav-link" href="/all-stores">
                   Travel
                 </Link>
               </li>
-              <li className="nav-item">
+              <li className="nav-item px-3">
                 <Link className="nav-link" href="/all-stores">
                   Shoes
                 </Link>
               </li>
-              <li className="nav-item">
+              <li className="nav-item px-3  ">
                 <Link className="nav-link" href="/all-stores">
                   Occasions
                 </Link>
               </li>
-              <li className="nav-item dropdown">
+              <li className="nav-item dropdown px-3">
                 <Link className="nav-link dropdown-toggle" href="/all-stores">
                   Coupons
                 </Link>
