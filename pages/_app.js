@@ -90,6 +90,7 @@ export default function App({ Component, pageProps }) {
           CONTAINER_TYPE === "wide" ? "wide" : "none-wide"
         }`}
       >
+        <link rel="stylesheet" href="/styles/font-declaration.css" />
         <style jsx global>
           {`
             :root {
