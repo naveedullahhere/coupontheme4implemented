@@ -13,7 +13,8 @@ html,
 body {
   max-width: 100vw;
   /* overflow-x: hidden; */
-  background-color: #eeee;
+  /* background-color: #eeee; */
+  background-color: var(--body-bg);
   font-family: Calibri;
 }
 

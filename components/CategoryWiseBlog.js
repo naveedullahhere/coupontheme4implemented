@@ -171,7 +171,7 @@ const CategoryWiseBlog = ({ data = null }) => {
 
   if (error) {
     return (
-      <div className="container-fluid my-5">
+      <div className="container-fluid my-3">
         <div className="alert alert-danger text-center" role="alert">
           {error}
           <button onClick={fetchBlogs} className="btn btn-link p-0 ms-2">
@@ -184,7 +184,7 @@ const CategoryWiseBlog = ({ data = null }) => {
 
   if (blogs.length === 0) {
     return (
-      <div className="container-fluid my-5">
+      <div className="container-fluid my-3">
         <div className="text-center py-5">
           <p className="text-muted fs-5">No blogs found</p>
         </div>
@@ -193,7 +193,7 @@ const CategoryWiseBlog = ({ data = null }) => {
   }
 
   return (
-    <div className="container-fluid my-5">
+    <div className="container-fluid my-3">
       <div className="row g-4">
         {blogs.map((blog) => (
           <BlogCard key={blog.id} blog={blog} isStyle4={data?.Style == 4} />

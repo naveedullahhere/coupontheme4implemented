@@ -101,6 +101,7 @@ export default function App({ Component, pageProps }) {
               --header-btn-text: ${data?.header?.button_color || "white"};
               --footer-bg: ${data?.footer?.background || "blue"};
               --footer-text: ${data?.footer?.color || "white"};
+              --body-bg: ${data.Style === 4 ? "#ffffff" : "#eeee"};
             }
           `}
         </style>
