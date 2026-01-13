@@ -1,0 +1,15 @@
+@font-face {
+    font-family: 'romie-r';
+    src: url('Romie-Regular.woff2') format('woff2');
+         /* url('Romie-Regular.otf') format('opentype'); */
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'neuzeit-grotesk';
+    src: url('neuzeit-grotesk.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }

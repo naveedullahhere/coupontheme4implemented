@@ -373,7 +373,7 @@ const BlogsPage = () => {
                                 <div
                                   className="text-dark lh-base fs-6"
                                   style={{
-                                    fontWeight: 400,
+                                    fontWeight: 500,
                                     lineHeight: 1.6,
                                     display: "-webkit-box",
                                     WebkitLineClamp: 3,

@@ -75,7 +75,7 @@ const CategoryWiseBlog = ({ data = null }) => {
             </div>
 
             <div className="card-body d-flex flex-column p-4">
-              <h3 className="card-title fw-bold fs-5 mb-3 text-dark">
+              <h3 className="card-title fw-semibold fs-6 mb-3 text-dark">
                 <Link href={`/blog/${blog.slug}`} className="text-decoration-none text-dark">
                   {blog.title}
                 </Link>
@@ -100,7 +100,7 @@ const CategoryWiseBlog = ({ data = null }) => {
                 <span className="text-muted small">{formattedDate}</span>
                 <Link
                   href={`/blog/${blog.slug}`}
-                  className="text-decoration-none fw-bold text-dark small"
+                  className="text-decoration-none fw-semibold text-dark small"
                 >
                   Read More →
                 </Link>

@@ -18,6 +18,7 @@ import Spinner from "@/components/Spinner";
 import { toast } from "react-hot-toast";
 import Header4 from "@/components/layout/Header4";
 import Footer4 from "@/components/layout/Footer4";
+import "@/public/fonts/font-dec.css";
 
 const Toaster = dynamic(
   () => import("react-hot-toast").then((c) => c.Toaster),
@@ -90,7 +91,7 @@ export default function App({ Component, pageProps }) {
           CONTAINER_TYPE === "wide" ? "wide" : "none-wide"
         }`}
       >
-        <link rel="stylesheet" href="/styles/font-declaration.css" />
+        {/* <link rel="stylesheet" href="../styles/font-declaration.css" /> */}
         <style jsx global>
           {`
             :root {
@@ -103,6 +104,12 @@ export default function App({ Component, pageProps }) {
               --footer-bg: ${data?.footer?.background || "blue"};
               --footer-text: ${data?.footer?.color || "white"};
               --body-bg: ${data.Style === 4 ? "#ffffff" : "#eeee"};
+              --font-family-body: ${data.Style === 4
+                ? "neuzeit-grotesk, Calibri"
+                : "Calibri"};
+              --font-family-heading: ${data.Style === 4
+                ? "neuzeit-grotesk"
+                : "Calibri"};
             }
           `}
         </style>

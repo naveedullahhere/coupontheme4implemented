@@ -240,7 +240,7 @@ const BlogDetailPage = () => {
                 </nav>
 
                 <div className="text-center mb-5 mt-5">
-                  <h1 className="display-5 fw-bold mb-4 text-dark">
+                  <h1 className="display-5 fw- mb-4 text-dark">
                     {blog.title}
                   </h1>
 
@@ -469,6 +469,9 @@ const BlogDetailPage = () => {
 
       {/* Custom Styles */}
       <style jsx global>{`
+      h1, h2, h3 {
+        font-family: "romie-r";
+      }
         .blog-detail-page {
           font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
             Roboto, sans-serif;
