@@ -143,7 +143,7 @@ startRealTimeCookieCheck();
                   OKAY
                 </button>
               </div>
-            </div>``
+            </div>
           </div>
         </div>
       )}
