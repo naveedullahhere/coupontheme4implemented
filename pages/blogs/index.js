@@ -172,9 +172,9 @@ const BlogsPage = () => {
         />
       </Head>
 
-      <div className="blogs-page">
+      <div className="blogs-page py-5">
         {/* Hero Section */}
-        <div className="hero-section py-5 mb-5">
+        <div className="hero-section py-5 mb-5 d-none">
           <div className="container-fluid">
             <div className="row justify-content-center">
               <div className="col-lg-10 col-xl-8 text-center">
@@ -317,14 +317,14 @@ const BlogsPage = () => {
             {/* Blogs Grid */}
             <div className="col-lg-9">
               {/* Results Header */}
-              <div className="d-flex justify-content-between align-items-center mb-5">
+              <div className="d-flex justify-content-between align-items-center mb-2 d-none">
                 <div>
                   <h2 className="h3 fw-bold mb-1">
                     {searchQuery
                       ? `Search Results for "${searchQuery}"`
                       : "Latest Articles"}
                   </h2>
-                  <p className="text-muted mb-0">
+                  <p className="text-muted mb-0 d-none">
                     {totalBlogs} article{totalBlogs !== 1 ? "s" : ""} found
                   </p>
                 </div>
@@ -346,7 +346,7 @@ const BlogsPage = () => {
                       const formattedDate = formatDate(blog.created_at);
 
                       return (
-                        <div className="col-lg-4 col-md-6 mb-4" key={blog.id}>
+                        <div className="col-lg-6 col-md-6 mb-4" key={blog.id}>
                           <div className="card h-100 border-0 rounded-0 shadow-hover">
                             <div
                               className="position-relative overflow-hidden"
@@ -364,14 +364,16 @@ const BlogsPage = () => {
 
                             <div className="card-body d-flex flex-column p-4">
                               <h3 className="card-title fw-bold fs-5 mb-3 text-dark">
-                                {blog.title}
+                                <Link href={`/blog/${blog.slug}`} className="text-decoration-none text-dark">
+                                  {blog.title}
+                                </Link>
                               </h3>
 
                               <div className="flex-grow-1 mb-3">
                                 <div
                                   className="text-dark lh-base fs-6"
                                   style={{
-                                    fontWeight: 500,
+                                    fontWeight: 400,
                                     lineHeight: 1.6,
                                     display: "-webkit-box",
                                     WebkitLineClamp: 3,
@@ -494,7 +496,7 @@ const BlogsPage = () => {
 
               {/* Newsletter Section */}
               {blogs.length > 0 && !searchQuery && (
-                <div className="mt-5 pt-5 border-top">
+                <div className="mt-5 pt-5 border-top d-none">
                   <div className="newsletter-section bg-primary text-white rounded p-5">
                     <div className="row align-items-center">
                       <div className="col-lg-8">
@@ -539,8 +541,8 @@ const BlogsPage = () => {
         }
 
         .hero-section {
-          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-          border-bottom: 1px solid #dee2e6;
+          // background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+          // border-bottom: 1px solid #dee2e6;
         }
 
         /* Card Design */

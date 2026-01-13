@@ -175,18 +175,32 @@ const BlogDetailPage = () => {
   return (
     <>
       <Head>
-        <title>{blog.title} | Blog</title>
+        <title>{blog.meta_title ? blog.meta_title : blog.title}</title>
         <meta
           name="description"
           content={
-            blog.short_description?.replace(/<[^>]*>/g, "") || blog.title
+            blog.meta_description
+              ? blog.meta_description
+              : blog.short_description?.replace(/<[^>]*>/g, "")
           }
         />
-        <meta name="keywords" content={blog.meta_key || blog.title} />
-        <meta property="og:title" content={blog.title} />
+        <meta
+          name="keywords"
+          content={
+            blog.meta_keyword ? blog.meta_keyword : blog.meta_key || blog.title
+          }
+        />
+        <meta
+          property="og:title"
+          content={blog.meta_title ? blog.meta_title : blog.title}
+        />
         <meta
           property="og:description"
-          content={blog.short_description?.replace(/<[^>]*>/g, "")}
+          content={
+            blog.meta_description
+              ? blog.meta_description
+              : blog.short_description?.replace(/<[^>]*>/g, "")
+          }
         />
         <meta property="og:image" content={imageUrl} />
         <meta property="og:type" content="article" />
@@ -476,7 +490,11 @@ const BlogDetailPage = () => {
           transform: translateY(-5px);
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
         }
-
+        .long-description img {
+          width: 75%;
+          object-fit: contain;
+          height: auto;
+        }
         .content-styles h2,
         .content-styles h3,
         .content-styles h4 {

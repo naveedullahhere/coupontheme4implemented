@@ -76,14 +76,16 @@ const CategoryWiseBlog = ({ data = null }) => {
 
             <div className="card-body d-flex flex-column p-4">
               <h3 className="card-title fw-bold fs-5 mb-3 text-dark">
-                {blog.title}
+                <Link href={`/blog/${blog.slug}`} className="text-decoration-none text-dark">
+                  {blog.title}
+                </Link>
               </h3>
 
               <div className="flex-grow-1 mb-3">
                 <div
                   className="text-dark lh-base fs-6"
                   style={{
-                    fontWeight: 500,
+                    fontWeight: 400,
                     lineHeight: 1.6,
                     display: "-webkit-box",
                     WebkitLineClamp: 3,
@@ -125,7 +127,11 @@ const CategoryWiseBlog = ({ data = null }) => {
           </div>
 
           <div className="card-body d-flex flex-column">
-            <h5 className="card-title fw-bold mb-3">{blog.title}</h5>
+            <h5 className="card-title fw-bold mb-3">
+              <Link href={`/blog/${blog.slug}`} className="text-decoration-none text-dark">
+                {blog.title}
+              </Link>
+            </h5>
 
             <div className="flex-grow-1 mb-3">
               <div
