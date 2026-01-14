@@ -1,154 +1,367 @@
-import { FOOTER_DESC, FOOTER_ABOUT } from '@/public/settings/there_is_nothing_holding_me_back/config'
-import Image from 'next/image'
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import { useState } from "react";
+import Link from "next/link";
+import { toast } from "react-hot-toast";
+import {
+  APP_KEY,
+  APP_URL,
+} from "@/public/settings/there_is_nothing_holding_me_back/config";
 
-import logo from '../../public/assets/logo-white.png'
+const Footer4 = ({ data }) => {
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-const Footer4 = ({ season, country, data }) => {
-const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [isSlidingOut, setIsSlidingOut] = useState(false);
+  let FOOTER_CONFIG = data.footer;
 
-  useEffect(() => {
-    if (!localStorage.getItem('cookiesAccepted') && data?.is_cookies_policy_popup === 1) {
-      // Delay popup by 3 seconds
-      const timer = setTimeout(() => {
-        setIsPopupVisible(true);
-      }, 3000);
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
 
-      // Cleanup timeout on unmount
-      return () => clearTimeout(timer);
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
     }
-  }, [data?.is_cookies_policy_popup]);
 
-  const handleAcceptCookies = () => {
-    const timestampNow = new Date().getTime(); // Current time in milliseconds
-    const expirationTime = timestampNow + 3600000; // 1 hour (3600000 milliseconds) from now
-    
-    // Save acceptance and expiration timestamp
-    localStorage.setItem('cookiesAccepted', 'true');
-    localStorage.setItem('cookieExpiration', expirationTime);
-  
-    setIsSlidingOut(true); // Start slide-out animation
-    setTimeout(() => {
-        setIsPopupVisible(false); // Remove popup from DOM
-    }, 300);
-  
-    // Start checking for expiration in real-time
-    startRealTimeCookieCheck();
-};
+    setIsLoading(true);
 
-const startRealTimeCookieCheck = () => {
-    const interval = setInterval(() => {
-        const timestampNow = new Date().getTime();
-        const expirationTime = localStorage.getItem('cookieExpiration');
-  
-        // If expiration time has passed, remove the cookie
-        if (expirationTime && timestampNow > expirationTime) {
-            localStorage.removeItem('cookiesAccepted');
-            localStorage.removeItem('cookieExpiration');
-            console.log('Cookies have been removed in real-time!');
-            clearInterval(interval); // Stop the interval after removal
-        }
-    }, 1000); // Check every second
-};
+    try {
+      const response = await fetch(`${APP_URL}api/subscribe`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          key: APP_KEY,
+        }),
+      });
 
-startRealTimeCookieCheck();
+      const data = await response.json();
 
-  
-  
+      if (data.success) {
+        toast.success(data.message);
+        setEmail("");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong! Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-
-
-    return (
-        <>
-
-            <div className="bg-footer">
-                <div className="container py-4 ">
-                    <div className="row">
-                        <div className="col-md-4">
-                            <Link href={'/'} className="footer-2-logo">
-                                <Image src={data?.url + "/" + data?.logo?.footer || logo} alt="" className={'position-relative my-1 header-logo w-100'} style={{ objectFit: 'contain' }} fill={true}></Image>
-                            </Link>
-                            <p className='text-white footer-desc'>{FOOTER_ABOUT}</p>
-                            <ul className='footer-link footer2-icon  p-0 text-white pt-1 d-flex'>
-                                <li><Link href=""> <i className='fab fa-facebook-f'></i></Link></li>
-                                <li><Link href=""> <i className='fab fa-pinterest-p'></i></Link></li>
-                                <li><Link href=""> <i className='fab fa-twitter '></i></Link></li>
-                            </ul>
-                        </div>
-                        <div className="col-md-8 row ">
-                            <div className="col-md-4 ">
-                                <h2 className='my-auto text-white fw-bolder'>About US</h2>
-                                <ul className='footer-link p-0 text-white pt-3'>
-                                    {data?.pages?.map((item) => {
-                                        return <li className='mb-1'>
-                                            <Link className='ms-0' href={`/pages/${item.slug}`}>{item.name}</Link>
-                                        </li>
-                                    })}
-                                    <li className='mb-1'>
-                                        <Link className='ms-0' href="/contact">Contact Us</Link>
-                                    </li>
-
-                                </ul>
-                            </div>
-                            <div className="col-md-4 ">
-                                <h2 className='my-auto text-white fw-bolder'>Shop By Country</h2>
-                                <ul className='footer-link p-0 text-white pt-3'>
-                                    {country?.slice(0, 6).map((countrydd) => {
-                                        return <li className='mb-1'>
-                                            <Link className='ms-0' href={`/country/${countrydd.slug}`}>{countrydd.name}</Link>
-                                        </li>
-
-                                    })}
-
-                                </ul>
-                            </div>
-                            <div className="col-md-4 ">
-                                <h2 className='my-auto text-white fw-bolder'>What's Trending</h2>
-                                <ul className='footer-link p-0 text-white pt-3'>
-                                    {season?.data?.slice(0, 6).map((seasondd) => {
-                                        return <li className='mb-1'>
-                                            <Link className='ms-0' href={`/season/${seasondd.slug}`}>{seasondd.name}</Link>
-                                        </li>
-                                    })}
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="copright_text">
-                                <hr className='text-white opacity-1' />
-                                <p className='text-white'>{FOOTER_DESC}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  return (
+    <footer className="bg-footer">
+      <div className="footer-container">
+        {/* Main Footer Content */}
+        <div className="footer-main">
+          {/* Dynamic Columns from JSON */}
+          {FOOTER_CONFIG?.columns.map((column, columnIndex) => (
+            <div key={columnIndex} className="footer-column">
+              <h3 className="footer-title text-footer">{column.title}</h3>
+              <ul className="footer-links">
+                {column.links.map((link, linkIndex) => (
+                  <li key={linkIndex}>
+                    <Link href={link.url} className="footer-link text-footer">
+                      {link.text}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
+          ))}
 
+          {/* Newsletter Column */}
+          <div className="footer-column newsletter-column">
+            <h3 className="footer-title text-footer">
+              {FOOTER_CONFIG?.newsletter.title}
+            </h3>
 
-            {isPopupVisible && (
-  <div
-  className={`cookie-policy-containers ${
-    isSlidingOut ? 'slide-out' : 'slide-up'
-  }`}
->
-          <div className="alert alert-black alert-dismissible fade show bg-black text-white m-auto py-4" role="alert">
-            <div className="row align-items-center">
-              <div className="col-10">
-                {data?.cookies_policy_popup_text || ''}{' '}
-                <Link className="text-white" href="/pages/cookies-policy">Cookies Policy</Link> and <Link className="text-white" href="/pages/privacy-policy">Privacy Policy</Link>.
-              </div>
-              <div className="col-2 text-end">
-                <button className="btn btn-light" onClick={handleAcceptCookies}>
-                  OKAY
+            <form onSubmit={handleEmailSubmit} className="newsletter-form">
+              <div className="newsletter-input-group">
+                <input
+                  type="email"
+                  className="newsletter-input"
+                  placeholder={FOOTER_CONFIG?.newsletter.placeholder}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="submit"
+                  className="newsletter-button"
+                  disabled={isLoading}
+                >
+                  {isLoading
+                    ? "Subscribing..."
+                    : FOOTER_CONFIG?.newsletter.buttonText}
                 </button>
               </div>
-            </div>
+            </form>
+
+            {/* You can remove the local success/error messages since we're using toast notifications */}
           </div>
         </div>
-      )}
-        </>
-    )
-}
 
-export default Footer4
+        {/* Social Links */}
+        <div className="footer-social">
+          <ul className="social-links">
+            {FOOTER_CONFIG?.socialLinks.map((social, index) => (
+              <li key={index}>
+                <Link
+                  href={social.url}
+                  className="social-link text-footer"
+                  aria-label={social.ariaLabel}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {social.text}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Copyright Section */}
+        <div className="footer-copyright">
+          <p className="text-footer">
+            © {FOOTER_CONFIG?.copyright.year},{" "}
+            {FOOTER_CONFIG?.copyright.company} |{" "}
+            {FOOTER_CONFIG?.copyright.links.map((link, index) => (
+              <span key={index} className="text-footer">
+                <Link href={link.url} className="copyright-link text-footer">
+                  {link.text}
+                </Link>
+                {index < FOOTER_CONFIG?.copyright.links.length - 1 && " | "}
+              </span>
+            ))}{" "}
+            <span className="privacy-icon">
+              {FOOTER_CONFIG?.copyright.privacyIcon}
+            </span>
+          </p>
+        </div>
+      </div>
+      <style jsx>{`
+        /* Custom CSS footer design matching the Neiman Marcus footer style */
+        .bg-footer {
+          width: 100%;
+          padding: 60px 0;
+          color: #000;
+        }
+
+        .footer-container {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 40px;
+        }
+
+        /* Main Footer Grid Layout */
+        .footer-main {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 40px;
+          margin-bottom: 40px;
+        }
+
+        .footer-column {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .footer-title {
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          margin-bottom: 20px;
+          text-transform: uppercase;
+          line-height: 1.4;
+        }
+
+        .footer-links {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .footer-link {
+          font-size: 13px;
+          color: var(--footer-text) !important;
+          text-decoration: none;
+          transition: opacity 0.3s ease;
+          line-height: 1.6;
+        }
+
+        .footer-link:hover {
+          opacity: 0.7;
+        }
+
+        /* Newsletter Column */
+        .newsletter-column {
+          grid-column: 4;
+        }
+
+        .newsletter-form {
+          margin-top: 15px;
+          margin-bottom: 15px;
+        }
+
+        .newsletter-input-group {
+          display: flex;
+          gap: 0;
+          margin-bottom: 12px;
+        }
+
+        .newsletter-input {
+          flex: 1;
+          padding: 12px 16px;
+          border: 1px solid #d3d3d3;
+          font-size: 13px;
+          border-radius: 0;
+          outline: none;
+          background: #fff;
+          color: #000;
+        }
+
+        .newsletter-input:disabled {
+          background-color: #f5f5f5;
+          cursor: not-allowed;
+        }
+
+        .newsletter-input::placeholder {
+          color: #999;
+        }
+
+        .newsletter-input:focus {
+          border-color: #000;
+        }
+
+        .newsletter-button {
+          background-color: #000;
+          color: #fff;
+          border: none;
+          padding: 12px 20px;
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          padding: 12px 32px;
+        }
+
+        .newsletter-button:disabled {
+          background-color: #666;
+          cursor: not-allowed;
+        }
+
+        .newsletter-button:hover:not(:disabled) {
+          background-color: #222;
+        }
+
+        /* Social Links */
+        .footer-social {
+          text-align: center;
+          padding: 20px 0;
+        }
+
+        .social-links {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+        }
+
+        .social-link {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          color: #000;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 600;
+          transition: opacity 0.3s ease;
+        }
+
+        .social-link:hover {
+          opacity: 0.6;
+        }
+
+        /* Copyright Section */
+        .footer-copyright {
+          text-align: center;
+          border-top: 1px solid #e0e0e0;
+          padding-top: 20px;
+        }
+
+        .footer-copyright p {
+          font-size: 12px;
+          color: #666;
+          margin: 0;
+          line-height: 1.6;
+        }
+
+        .copyright-link {
+          color: #000;
+          text-decoration: none;
+          transition: opacity 0.3s ease;
+        }
+
+        .copyright-link:hover {
+          opacity: 0.7;
+        }
+
+        .privacy-icon {
+          margin: 0 4px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+          .footer-main {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+          }
+
+          .newsletter-column {
+            grid-column: 1 / -1;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .footer-container {
+            padding: 0 20px;
+          }
+
+          .footer-main {
+            grid-template-columns: 1fr;
+            gap: 30px;
+          }
+
+          .newsletter-input-group {
+            flex-direction: column;
+          }
+
+          .newsletter-button {
+            width: 100%;
+          }
+
+          .footer-title {
+            font-size: 12px;
+          }
+
+          .footer-link {
+            font-size: 12px;
+          }
+        }
+      `}</style>
+    </footer>
+  );
+};
+
+export default Footer4;

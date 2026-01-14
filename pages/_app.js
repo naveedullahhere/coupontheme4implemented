@@ -176,13 +176,15 @@ export default function App({ Component, pageProps }) {
             />
           )}
           {data.Style === 4 && (
+            <>
             <Footer4
               data={data}
               category={category}
               season={season}
               coupons={coupons}
               country={country}
-            />
+              />
+              </>
           )}
         </Layout>
       </div>
