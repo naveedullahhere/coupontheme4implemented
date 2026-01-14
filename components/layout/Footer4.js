@@ -11,6 +11,7 @@ const Footer4 = ({ data }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   let FOOTER_CONFIG = data?.footer?.menu;
+  let TRENDING_BLOGS = data?.blogs;
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
@@ -54,10 +55,22 @@ const Footer4 = ({ data }) => {
     <footer className="bg-footer">
       <div className="footer-container">
         {/* Main Footer Content */}
-        <div className="footer-main">
+        <div className="row">
+           <div className="col-md-4">
+              <h3 className="footer-title text-footer">Trending</h3>
+              <ul className="footer-links">
+                {TRENDING_BLOGS.map((blogs, linkIndex) => (
+                  <li key={blogs.id}>
+                    <Link href={`/blog/${blogs.slug}`} className="footer-link text-footer">
+                      {blogs.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           {/* Dynamic Columns from JSON */}
           {FOOTER_CONFIG?.columns.map((column, columnIndex) => (
-            <div key={columnIndex} className="footer-column">
+            <div key={columnIndex} className="col-md-2">
               <h3 className="footer-title text-footer">{column.title}</h3>
               <ul className="footer-links">
                 {column.links.map((link, linkIndex) => (
@@ -72,8 +85,8 @@ const Footer4 = ({ data }) => {
           ))}
 
           {/* Newsletter Column */}
-          <div className="footer-column newsletter-column">
-            <h3 className="footer-title text-footer">
+          <div className="col-md-4 newsletter-column">
+            <h3 className="newsletter-title text-footer">
               {FOOTER_CONFIG?.newsletter.title}
             </h3>
 
@@ -170,6 +183,14 @@ const Footer4 = ({ data }) => {
         }
 
         .footer-title {
+          font-size: 16px;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          margin-bottom: 20px;
+          text-transform: uppercase;
+          line-height: 1.4;
+        }
+        .newsletter-title {
           font-size: 13px;
           font-weight: 700;
           letter-spacing: 0.5px;

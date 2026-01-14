@@ -1,6 +1,6 @@
 module.exports = {
   APP_URL: "https://creativeitsols.com/system/public/",
-  APP_KEY: "app_F4TErD8VFkmxAwWTyonoYhDlIUuRT1GUKVMnDhQV",
+  APP_KEY: "app_gMKPjRogTddn0qlwa54RHWIgWsHhBNrcuprhava5",
   DEFAULT_TITLE: "Coupon Codes",
   DEFAULT_DESC: " Coupon Codes",
   CONTAINER_TYPE: "wisde",
