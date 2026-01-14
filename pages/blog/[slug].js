@@ -291,7 +291,7 @@ const BlogDetailPage = () => {
             <div className="row justify-content-center">
               <div className="col-lg-8">
                 {/* Short Description */}
-                {blog.short_description && (
+                {/* {blog.short_description && (
                   <div className="short-description mb-5">
                     <div
                       className="lead fs-2 text-dark fw-bolder lh-base"
@@ -300,7 +300,7 @@ const BlogDetailPage = () => {
                       }}
                     />
                   </div>
-                )}
+                )} */}
 
                 {/* Long Description */}
                 {blog.long_description && (
