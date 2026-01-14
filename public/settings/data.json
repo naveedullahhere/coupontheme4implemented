@@ -26,144 +26,146 @@
     "footer": {
         "background": "#f28c37",
         "color": "#ffffff",
-        "columns": [
-            {
-                "title": "CUSTOMER SERVICE",
-                "links": [
-                    {
-                        "text": "Track an Order",
-                        "url": "/track-order"
-                    },
-                    {
-                        "text": "Shipping & Delivery",
-                        "url": "/shipping"
-                    },
-                    {
-                        "text": "Returns",
-                        "url": "/returns"
-                    },
-                    {
-                        "text": "Pay My Credit Card",
-                        "url": "/payment"
-                    },
-                    {
-                        "text": "Services of NM",
-                        "url": "/services"
-                    },
-                    {
-                        "text": "Assistance",
-                        "url": "/assistance"
-                    }
-                ]
-            },
-            {
-                "title": "STORES & CORPORATE",
-                "links": [
-                    {
-                        "text": "Store Locations & Events",
-                        "url": "/stores"
-                    },
-                    {
-                        "text": "About Us",
-                        "url": "/about"
-                    },
-                    {
-                        "text": "Investor Relations",
-                        "url": "/investors"
-                    },
-                    {
-                        "text": "Press Inquiries",
-                        "url": "/press"
-                    },
-                    {
-                        "text": "Careers",
-                        "url": "/careers"
-                    },
-                    {
-                        "text": "The Heart of Neiman Marcus",
-                        "url": "/heart"
-                    }
-                ]
-            },
-            {
-                "title": "EXPLORE",
-                "links": [
-                    {
-                        "text": "Magazine",
-                        "url": "/magazine"
-                    },
-                    {
-                        "text": "Gift Cards",
-                        "url": "/gift-cards"
-                    },
-                    {
-                        "text": "NM Credit Card",
-                        "url": "/credit-card"
-                    },
-                    {
-                        "text": "Fashioned for Change",
-                        "url": "/change"
-                    }
-                ]
-            }
-        ],
-        "newsletter": {
-            "title": "Got 15% off* your next purchase when you sign up for email updates",
-            "placeholder": "Enter Email Address",
-            "buttonText": "SIGN UP",
-            "messages": {
-                "success": "Thank you for subscribing!",
-                "error": "Please enter a valid email address"
-            }
-        },
-        "socialLinks": [
-            {
-                "text": "f",
-                "url": "https://facebook.com",
-                "ariaLabel": "Facebook"
-            },
-            {
-                "text": "𝕏",
-                "url": "https://twitter.com",
-                "ariaLabel": "Twitter"
-            },
-            {
-                "text": "P",
-                "url": "https://pinterest.com",
-                "ariaLabel": "Pinterest"
-            },
-            {
-                "text": "◉",
-                "url": "https://instagram.com",
-                "ariaLabel": "Instagram"
-            }
-        ],
-        "copyright": {
-            "year": "2026",
-            "company": "Neiman Marcus",
-            "links": [
+        "menu": {
+            "columns": [
                 {
-                    "text": "Terms & Conditions and Privacy Policy",
-                    "url": "/terms"
+                    "title": "CUSTOMER SERVICE",
+                    "links": [
+                        {
+                            "text": "Track an Order",
+                            "url": "/track-order"
+                        },
+                        {
+                            "text": "Shipping & Delivery",
+                            "url": "/shipping"
+                        },
+                        {
+                            "text": "Returns",
+                            "url": "/returns"
+                        },
+                        {
+                            "text": "Pay My Credit Card",
+                            "url": "/payment"
+                        },
+                        {
+                            "text": "Services of NM",
+                            "url": "/services"
+                        },
+                        {
+                            "text": "Assistance",
+                            "url": "/assistance"
+                        }
+                    ]
                 },
                 {
-                    "text": "Your Privacy Choices",
-                    "url": "/privacy"
+                    "title": "STORES & CORPORATE",
+                    "links": [
+                        {
+                            "text": "Store Locations & Events",
+                            "url": "/stores"
+                        },
+                        {
+                            "text": "About Us",
+                            "url": "/about"
+                        },
+                        {
+                            "text": "Investor Relations",
+                            "url": "/investors"
+                        },
+                        {
+                            "text": "Press Inquiries",
+                            "url": "/press"
+                        },
+                        {
+                            "text": "Careers",
+                            "url": "/careers"
+                        },
+                        {
+                            "text": "The Heart of Neiman Marcus",
+                            "url": "/heart"
+                        }
+                    ]
                 },
                 {
-                    "text": "Cookie Preferences",
-                    "url": "/cookies"
-                },
-                {
-                    "text": "CA Supply Chain Transparency Act",
-                    "url": "/supply-chain"
-                },
-                {
-                    "text": "Sitemap",
-                    "url": "/sitemap"
+                    "title": "EXPLORE",
+                    "links": [
+                        {
+                            "text": "Magazine",
+                            "url": "/magazine"
+                        },
+                        {
+                            "text": "Gift Cards",
+                            "url": "/gift-cards"
+                        },
+                        {
+                            "text": "NM Credit Card",
+                            "url": "/credit-card"
+                        },
+                        {
+                            "text": "Fashioned for Change",
+                            "url": "/change"
+                        }
+                    ]
                 }
             ],
-            "privacyIcon": "⚙️"
+            "newsletter": {
+                "title": "Got 15% off* your next purchase when you sign up for email updates",
+                "placeholder": "Enter Email Address",
+                "buttonText": "SIGN UP",
+                "messages": {
+                    "success": "Thank you for subscribing!",
+                    "error": "Please enter a valid email address"
+                }
+            },
+            "socialLinks": [
+                {
+                    "text": "f",
+                    "url": "https://facebook.com",
+                    "ariaLabel": "Facebook"
+                },
+                {
+                    "text": "𝕏",
+                    "url": "https://twitter.com",
+                    "ariaLabel": "Twitter"
+                },
+                {
+                    "text": "P",
+                    "url": "https://pinterest.com",
+                    "ariaLabel": "Pinterest"
+                },
+                {
+                    "text": "◉",
+                    "url": "https://instagram.com",
+                    "ariaLabel": "Instagram"
+                }
+            ],
+            "copyright": {
+                "year": "2026",
+                "company": "Neiman Marcus",
+                "links": [
+                    {
+                        "text": "Terms & Conditions and Privacy Policy",
+                        "url": "/terms"
+                    },
+                    {
+                        "text": "Your Privacy Choices",
+                        "url": "/privacy"
+                    },
+                    {
+                        "text": "Cookie Preferences",
+                        "url": "/cookies"
+                    },
+                    {
+                        "text": "CA Supply Chain Transparency Act",
+                        "url": "/supply-chain"
+                    },
+                    {
+                        "text": "Sitemap",
+                        "url": "/sitemap"
+                    }
+                ],
+                "privacyIcon": "⚙️"
+            }
         }
     },
     "category": [

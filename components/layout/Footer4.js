@@ -10,7 +10,7 @@ const Footer4 = ({ data }) => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  let FOOTER_CONFIG = data.footer;
+  let FOOTER_CONFIG = data?.footer?.menu;
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
