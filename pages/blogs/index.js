@@ -10,8 +10,11 @@ import {
 } from "@/public/settings/there_is_nothing_holding_me_back/config";
 import Spinner from "@/components/Spinner";
 
-const BlogsPage = () => {
+const BlogsPage = ({ categoryParam }) => {
   const router = useRouter();
+  const { category: categorySlug } = router.query;
+  const actualCategorySlug = categorySlug || categoryParam;
+
   const [blogs, setBlogs] = useState([]);
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
@@ -24,6 +27,8 @@ const BlogsPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalBlogs, setTotalBlogs] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategoryName, setSelectedCategoryName] = useState("");
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Fetch filter options (categories and tags)
   useEffect(() => {
@@ -36,20 +41,49 @@ const BlogsPage = () => {
         if (response.ok) {
           const result = await response.json();
           if (result.success && result.data) {
-            setCategories(result.data.categories || []);
+            const categoriesData = result.data.categories || [];
+            setCategories(categoriesData);
             setTags(result.data.tags || []);
+
+            if (actualCategorySlug) {
+              const categorySlugStr = Array.isArray(actualCategorySlug)
+                ? actualCategorySlug[0]
+                : actualCategorySlug;
+
+              const categoryFromSlug = categoriesData.find(
+                (cat) =>
+                  cat.slug === categorySlugStr ||
+                  cat.id.toString() === categorySlugStr
+              );
+
+              if (categoryFromSlug) {
+                setSelectedCategories([categoryFromSlug.id]);
+                setSelectedCategoryName(categoryFromSlug.name);
+              } else {
+                setSelectedCategories([]);
+                setSelectedCategoryName("");
+              }
+            } else {
+              setSelectedCategories([]);
+              setSelectedCategoryName("");
+            }
+
+            setHasInitialized(true);
           }
         }
       } catch (err) {
         console.error("Error fetching filter options:", err);
+        setHasInitialized(true);
       }
     };
 
     fetchFilterOptions();
-  }, []);
+  }, [actualCategorySlug]);
 
   // Fetch blogs with filters
   const fetchBlogs = useCallback(async () => {
+    if (!hasInitialized || categories.length === 0) return;
+
     try {
       setLoadingBlogs(true);
 
@@ -87,22 +121,43 @@ const BlogsPage = () => {
       setLoading(false);
       setLoadingBlogs(false);
     }
-  }, [selectedCategories, selectedTags, currentPage, searchQuery]);
+  }, [
+    selectedCategories,
+    selectedTags,
+    currentPage,
+    searchQuery,
+    hasInitialized,
+    categories.length,
+  ]);
 
   // Initial fetch and when filters change
   useEffect(() => {
-    fetchBlogs();
-  }, [fetchBlogs]);
+    if (hasInitialized && categories.length > 0) {
+      fetchBlogs();
+    }
+  }, [fetchBlogs, hasInitialized, categories.length]);
 
   // Handle category selection
-  const handleCategoryToggle = (categoryId) => {
-    setSelectedCategories((prev) => {
-      if (prev.includes(categoryId)) {
-        return prev.filter((id) => id !== categoryId);
-      } else {
-        return [...prev, categoryId];
+  const handleCategoryToggle = (categoryId, categorySlug) => {
+    const isCurrentlySelected = selectedCategories.includes(categoryId);
+
+    if (isCurrentlySelected) {
+      setSelectedCategories([]);
+      setSelectedCategoryName("");
+      router.push("/blogs", undefined, { shallow: true });
+    } else {
+      const category = categories.find((cat) => cat.id === categoryId);
+      if (category) {
+        setSelectedCategories([categoryId]);
+        setSelectedCategoryName(category.name);
+
+        router.push(`/blogs/${category.slug || category.id}`, undefined, {
+          shallow: true,
+        });
       }
-    });
+    }
+
+    setSelectedTags([]);
     setCurrentPage(1);
   };
 
@@ -148,9 +203,23 @@ const BlogsPage = () => {
     setSelectedTags([]);
     setSearchQuery("");
     setCurrentPage(1);
+    setSelectedCategoryName("");
+    router.push("/blogs", undefined, { shallow: true });
   };
 
-  if (loading) {
+  const removeCategory = () => {
+    setSelectedCategories([]);
+    setSelectedCategoryName("");
+    setCurrentPage(1);
+    router.push("/blogs", undefined, { shallow: true });
+  };
+
+  const removeTag = (tagId) => {
+    setSelectedTags((prev) => prev.filter((id) => id !== tagId));
+    setCurrentPage(1);
+  };
+
+  if (loading && !hasInitialized) {
     return (
       <div className="min-vh-100 d-flex justify-content-center align-items-center">
         <Spinner size="lg" />
@@ -161,7 +230,11 @@ const BlogsPage = () => {
   return (
     <>
       <Head>
-        <title>Blogs | Our Articles & Insights</title>
+        <title>
+          {selectedCategoryName
+            ? `${selectedCategoryName} | Blog Category`
+            : "Blogs | Our Articles & Insights"}
+        </title>
         <meta
           name="description"
           content="Explore our collection of insightful articles, tips, and guides on various topics."
@@ -173,15 +246,17 @@ const BlogsPage = () => {
       </Head>
 
       <div className="blogs-page py-5">
-        {/* Hero Section */}
         <div className="hero-section py-5 mb-5 d-none">
           <div className="container-fluid">
             <div className="row justify-content-center">
               <div className="col-lg-10 col-xl-8 text-center">
-                <h1 className="display-4 fw-bold mb-4">Our Blog</h1>
+                <h1 className="display-4 fw-bold mb-4">
+                  {selectedCategoryName || "Our Blog"}
+                </h1>
                 <p className="lead mb-0">
-                  Discover insightful articles, tips, and guides from our
-                  experts
+                  {selectedCategoryName
+                    ? `Explore all articles in ${selectedCategoryName} category`
+                    : "Discover insightful articles, tips, and guides from our experts"}
                 </p>
               </div>
             </div>
@@ -196,7 +271,6 @@ const BlogsPage = () => {
                 className="sidebar-filters bg-white p-4 sticky-top"
                 style={{ top: "20px" }}
               >
-                {/* Search */}
                 <div className="mb-5">
                   <h5 className="fw-bold mb-3 text-dark">Search Articles</h5>
                   <form onSubmit={handleSearch}>
@@ -238,7 +312,7 @@ const BlogsPage = () => {
                           <span key={catId} className="filter-chip">
                             {cat.name}
                             <button
-                              onClick={() => handleCategoryToggle(catId)}
+                              onClick={() => removeCategory()}
                               className="filter-remove"
                             >
                               <i className="bi bi-x">x</i>
@@ -252,7 +326,7 @@ const BlogsPage = () => {
                           <span key={tagId} className="filter-chip">
                             {tag.name}
                             <button
-                              onClick={() => handleTagToggle(tagId)}
+                              onClick={() => removeTag(tagId)}
                               className="filter-remove"
                             >
                               <i className="bi bi-x">x</i>
@@ -277,7 +351,9 @@ const BlogsPage = () => {
                               ? "active"
                               : ""
                           }`}
-                          onClick={() => handleCategoryToggle(category.id)}
+                          onClick={() =>
+                            handleCategoryToggle(category.id, category.slug)
+                          }
                         >
                           {category.name}
                           {selectedCategories.includes(category.id) && (
@@ -317,17 +393,24 @@ const BlogsPage = () => {
             {/* Blogs Grid */}
             <div className="col-lg-9">
               {/* Results Header */}
-              <div className="d-flex justify-content-between align-items-center mb-2 d-none">
+              <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                  <h2 className="h3 fw-bold mb-1">
+                  <h2 className="h2 fw-bold mb-2">
                     {searchQuery
                       ? `Search Results for "${searchQuery}"`
+                      : selectedCategoryName
+                      ? selectedCategoryName
                       : "Latest Articles"}
                   </h2>
-                  <p className="text-muted mb-0 d-none">
-                    {totalBlogs} article{totalBlogs !== 1 ? "s" : ""} found
-                  </p>
                 </div>
+                {selectedCategoryName && (
+                  <button
+                    onClick={clearFilters}
+                    className="button button-secondary d-none d-md-block"
+                  >
+                    View All Categories
+                  </button>
+                )}
               </div>
 
               {/* Blogs Grid */}
@@ -364,7 +447,10 @@ const BlogsPage = () => {
 
                             <div className="card-body d-flex flex-column p-4">
                               <h3 className="card-title fw-bold fs-5 mb-3 text-dark">
-                                <Link href={`/blog/${blog.slug}`} className="text-decoration-none text-dark">
+                                <Link
+                                  href={`/blog/${blog.slug}`}
+                                  className="text-decoration-none text-dark"
+                                >
                                   {blog.title}
                                 </Link>
                               </h3>
@@ -479,17 +565,20 @@ const BlogsPage = () => {
                   <div className="mb-4">
                     <i className="bi bi-search display-1 text-muted"></i>
                   </div>
-                  <h3 className="h4 fw-bold mb-3">No articles found</h3>
                   <p className="text-muted mb-4">
                     {searchQuery
                       ? `No articles match your search for "${searchQuery}"`
+                      : selectedCategoryName
+                      ? `No articles found in "${selectedCategoryName}" category`
                       : "No articles available at the moment"}
                   </p>
                   <button
                     onClick={clearFilters}
                     className="button button-primary"
                   >
-                    Clear Filters
+                    {selectedCategoryName
+                      ? "View All Categories"
+                      : "Clear Filters"}
                   </button>
                 </div>
               )}
@@ -540,9 +629,18 @@ const BlogsPage = () => {
             Roboto, sans-serif;
         }
 
-        .hero-section {
-          // background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-          // border-bottom: 1px solid #dee2e6;
+        .breadcrumb {
+          background: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .breadcrumb-item a {
+          color: var(--primary);
+        }
+
+        .breadcrumb-item.active {
+          color: #6c757d;
         }
 
         /* Card Design */
@@ -564,34 +662,6 @@ const BlogsPage = () => {
 
         .shadow-hover:hover .card-img-top {
           transform: scale(1.05);
-        }
-
-        .btn-sm {
-          padding: 6px 16px;
-          font-size: 13px;
-        }
-
-        /* Search */
-        .search-group {
-          position: relative;
-        }
-
-        .search-input {
-          padding: 12px 16px;
-          border: 1px solid #dee2e6;
-          border-radius: 8px 0 0 8px;
-          border-right: none;
-        }
-
-        .search-input:focus {
-          box-shadow: none;
-          border-color: var(--primary);
-        }
-
-        .search-btn {
-          border-radius: 0 8px 8px 0;
-          padding: 12px 20px;
-          white-space: nowrap;
         }
 
         /* Filter Chips */
@@ -649,6 +719,8 @@ const BlogsPage = () => {
           align-items: center;
           justify-content: space-between;
           gap: 8px;
+          width: 100%;
+          text-align: left;
         }
 
         .filter-option:hover {
@@ -700,69 +772,13 @@ const BlogsPage = () => {
           );
         }
 
-        .newsletter-input {
-          padding: 12px 16px;
-          border: none;
-          border-radius: 8px;
-        }
-
-        .newsletter-input:focus {
-          box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
-        }
-
-        .newsletter-icon {
-          opacity: 0.8;
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
+        @media (max-width: 768px) {
           .sidebar-filters {
             position: static !important;
           }
-        }
 
-        @media (max-width: 768px) {
-          .hero-section .display-4 {
-            font-size: 2rem;
-          }
-
-          .search-group {
-            flex-direction: column;
-          }
-
-          .search-input {
-            border-radius: 8px;
-            border-right: 1px solid #dee2e6;
-            margin-bottom: 10px;
-          }
-
-          .search-btn {
-            border-radius: 8px;
-            width: 100%;
-          }
-
-          .newsletter-form {
-            flex-direction: column;
-          }
-
-          .newsletter-input {
-            margin-bottom: 10px;
-          }
-
-          .position-relative {
-            height: 220px !important;
-          }
-        }
-
-        @media (max-width: 576px) {
-          .col-lg-4,
-          .col-md-6 {
-            margin-bottom: 1.5rem;
-          }
-
-          .pagination .page-link {
-            padding: 6px 12px;
-            font-size: 14px;
+          .filter-option {
+            width: calc(50% - 4px);
           }
         }
       `}</style>
