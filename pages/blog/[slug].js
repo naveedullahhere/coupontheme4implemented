@@ -206,7 +206,7 @@ const BlogDetailPage = () => {
         <meta property="og:type" content="article" />
       </Head>
 
-      <div className="blog-detail-page">
+      <div className="blog-detail-page blogbg">
         {/* Hero Section */}
         <div className="blog-hero-section position-relative">
           <div className="container-fluid">
@@ -240,9 +240,7 @@ const BlogDetailPage = () => {
                 </nav>
 
                 <div className="text-center mb-5 mt-5">
-                  <h1 className="display-5 fw- mb-4 text-dark">
-                    {blog.title}
-                  </h1>
+                  <h1 className="display-5 fw- mb-4 text-dark">{blog.title}</h1>
 
                   <div className="d-flex justify-content-center align-items-center gap-4 text-muted mb-4">
                     <span className="d-flex align-items-center gap-2">
@@ -469,9 +467,11 @@ const BlogDetailPage = () => {
 
       {/* Custom Styles */}
       <style jsx global>{`
-      h1, h2, h3 {
-        font-family: "romie-r";
-      }
+        h1,
+        h2,
+        h3 {
+          font-family: "romie-r";
+        }
         .blog-detail-page {
           font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
             Roboto, sans-serif;

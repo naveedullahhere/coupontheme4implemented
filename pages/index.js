@@ -72,7 +72,7 @@ export default function Home({ data, setMetas, metas }) {
     );
   else {
     return (
-      <>
+      <div className={`${data.Style === 4 ? "blogbg" : ""} `}>
         <Slider data={data} sliderData={homeData} />
         {data.Style === 4 && <CategoryWiseBlog data={data} />}
 
@@ -93,7 +93,7 @@ export default function Home({ data, setMetas, metas }) {
         )}
 
         {data.Style !== 4 ? <Favorite styledata={data} /> : ""}
-      </>
+      </div>
     );
   }
 }

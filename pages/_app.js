@@ -2,9 +2,6 @@ import "@/styles/globals.css";
 import Header1 from "@/components/layout/Header1";
 import Header2 from "@/components/layout/Header2";
 import Layout from "./Layout";
-import logo from "@/public/assets/logo.png";
-import Slider from "../components/Slider";
-import Popular from "@/components/Popular";
 import Footer1 from "@/components/layout/Footer1";
 import Footer2 from "@/components/layout/Footer2";
 import dynamic from "next/dynamic";
@@ -15,10 +12,10 @@ import {
   CONTAINER_TYPE,
 } from "@/public/settings/there_is_nothing_holding_me_back/config";
 import Spinner from "@/components/Spinner";
-import { toast } from "react-hot-toast";
 import Header4 from "@/components/layout/Header4";
 import Footer4 from "@/components/layout/Footer4";
 import "@/public/fonts/font-dec.css";
+import Head from "next/head";
 
 const Toaster = dynamic(
   () => import("react-hot-toast").then((c) => c.Toaster),
@@ -29,7 +26,6 @@ const Toaster = dynamic(
 
 export default function App({ Component, pageProps }) {
   const [data, setData] = useState([]);
-
   const [err, setErr] = useState(false);
   const [loading, setLoading] = useState(true);
   const [category, setcategory] = useState();
@@ -58,8 +54,6 @@ export default function App({ Component, pageProps }) {
     fetchData();
   }, []);
 
-  console.log(data?.header?.background);
-
   if (loading)
     return (
       <Layout
@@ -86,12 +80,20 @@ export default function App({ Component, pageProps }) {
     );
   else {
     return (
-      <div
-        className={`_element ${
-          CONTAINER_TYPE === "wide" ? "wide" : "none-wide"
-        }`}
-      >
-        {/* <link rel="stylesheet" href="../styles/font-declaration.css" /> */}
+      <>
+        <Head>
+          {data?.head_scripts && (
+            <script
+              dangerouslySetInnerHTML={{
+                __html: data.head_scripts
+                  .replace(/<script>/gi, "")
+                  .replace(/<\/script>/gi, "")
+                  .trim(),
+              }}
+            />
+          )}
+        </Head>
+
         <style jsx global>
           {`
             :root {
@@ -114,80 +116,86 @@ export default function App({ Component, pageProps }) {
           `}
         </style>
 
-        <Layout
-          title={`${metas.title}`}
-          metaTitle={`${metas.metaTitle}`}
-          metaDescription={metas.metaDescription}
-          logo=""
-          metaKeywords={metas.metaKeyword}
+        <div
+          className={`_element ${
+            CONTAINER_TYPE === "wide" ? "wide" : "none-wide"
+          }`}
         >
-          {data.Style === 1 && (
-            <Header1
-              data={data}
-              category={category}
-              season={season}
-              coupons={coupons}
-              country={country}
-            />
-          )}
-          {data.Style === 2 && (
-            <Header2
-              data={data}
-              category={category}
-              season={season}
-              coupons={coupons}
-              country={country}
-            />
-          )}
-          {data.Style === 4 && (
-            <Header4
-              data={data}
-              category={category}
-              season={season}
-              coupons={coupons}
-              country={country}
-            />
-          )}
-          <div className={`min-vh-90`}>
-            <Component
-              {...pageProps}
-              data={data}
-              metas={metas}
-              setMetas={setMetas}
-            />
-          </div>
-          <Toaster position="top-right" />
-          {data.Style === 1 && (
-            <Footer1
-              data={data}
-              category={category}
-              season={season}
-              coupons={coupons}
-              country={country}
-            />
-          )}
-          {data.Style === 2 && (
-            <Footer2
-              data={data}
-              category={category}
-              season={season}
-              coupons={coupons}
-              country={country}
-            />
-          )}
-          {data.Style === 4 && (
-            <>
-            <Footer4
-              data={data}
-              category={category}
-              season={season}
-              coupons={coupons}
-              country={country}
+          <Layout
+            title={`${metas.title}`}
+            metaTitle={`${metas.metaTitle}`}
+            metaDescription={metas.metaDescription}
+            logo=""
+            metaKeywords={metas.metaKeyword}
+          >
+            {data.Style === 1 && (
+              <Header1
+                data={data}
+                category={category}
+                season={season}
+                coupons={coupons}
+                country={country}
               />
+            )}
+            {data.Style === 2 && (
+              <Header2
+                data={data}
+                category={category}
+                season={season}
+                coupons={coupons}
+                country={country}
+              />
+            )}
+            {data.Style === 4 && (
+              <Header4
+                data={data}
+                category={category}
+                season={season}
+                coupons={coupons}
+                country={country}
+              />
+            )}
+            <div className={`min-vh-90`}>
+              <Component
+                {...pageProps}
+                data={data}
+                metas={metas}
+                setMetas={setMetas}
+              />
+            </div>
+            <Toaster position="top-right" />
+            {data.Style === 1 && (
+              <Footer1
+                data={data}
+                category={category}
+                season={season}
+                coupons={coupons}
+                country={country}
+              />
+            )}
+            {data.Style === 2 && (
+              <Footer2
+                data={data}
+                category={category}
+                season={season}
+                coupons={coupons}
+                country={country}
+              />
+            )}
+            {data.Style === 4 && (
+              <>
+                <Footer4
+                  data={data}
+                  category={category}
+                  season={season}
+                  coupons={coupons}
+                  country={country}
+                />
               </>
-          )}
-        </Layout>
-      </div>
+            )}
+          </Layout>
+        </div>
+      </>
     );
   }
 }

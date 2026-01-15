@@ -245,7 +245,7 @@ const BlogsPage = ({ categoryParam }) => {
         />
       </Head>
 
-      <div className="blogs-page py-5">
+      <div className="blogs-page py-5 blogbg">
         <div className="hero-section py-5 mb-5 d-none">
           <div className="container-fluid">
             <div className="row justify-content-center">
