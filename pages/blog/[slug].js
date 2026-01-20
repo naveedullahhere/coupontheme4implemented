@@ -76,7 +76,7 @@ const BlogDetailPage = () => {
         // Filter out current blog from related blogs
         const filtered =
           result.data?.filter((item) => item.slug !== slug) || [];
-        setRelatedBlogs(filtered.slice(0, 3));
+        setRelatedBlogs(filtered.slice(0, 2));
       }
     } catch (err) {
       console.error("Error fetching related blogs:", err);
@@ -240,7 +240,7 @@ const BlogDetailPage = () => {
                 </nav>
 
                 <div className="text-center mb-5 mt-5">
-                  <h1 className="display-5 fw- mb-4 text-dark">{blog.title}</h1>
+                  <h1 className="display-5 fw- mb-4 text-dark font-modernMTPro">{blog.title}</h1>
 
                   <div className="d-flex justify-content-center align-items-center gap-4 text-muted mb-4">
                     <span className="d-flex align-items-center gap-2">
@@ -249,7 +249,7 @@ const BlogDetailPage = () => {
                     </span>
 
                     {categoryName && (
-                      <span className="badge bg-primary rounded-pill px-3 py-2">
+                      <span className="badge outline-dark  bg-primary rounded-pill px-3 py-2 font-modernMTPro">
                         {categoryName}
                       </span>
                     )}
@@ -356,11 +356,11 @@ const BlogDetailPage = () => {
         </div>
 
         {relatedBlogs.length > 0 && (
-          <div className="related-blogs-section bg-light py-5">
+          <div className="related-blogs-section bg- py-5">
             <div className="container">
               <div className="row">
                 <div className="col-12">
-                  <h2 className="mb-5 fw-bold text-center">Related Articles</h2>
+                  <h2 className="mb-5 fw-bold text-center font-modernMTPro">Related Articles</h2>
                 </div>
 
                 {loadingRelated ? (
@@ -377,8 +377,8 @@ const BlogDetailPage = () => {
                       : null;
 
                     return (
-                      <div className="col-md-4 mb-4" key={relatedBlog.id}>
-                        <div className="card h-100 border-0 shadow-sm hover-shadow transition-all">
+                      <div className="col-md-6 mb-4" key={relatedBlog.id}>
+                        <div className="card h-100 border-0 transition-all">
                           <div
                             className="position-relative"
                             style={{ height: "200px" }}
@@ -395,10 +395,10 @@ const BlogDetailPage = () => {
                               className="card-img-top object-fit-cover"
                             />
                           </div>
-                          <div className="card-body">
+                          <div className="card-body px-0">
                             <div className="d-flex justify-content-between align-items-center mb-2">
                               {relatedCategoryName && (
-                                <span className="badge bg-primary header-btn-text bg-opacity-10  rounded-pill px-3 py-1">
+                                <span className="badge btn-outline-dark  bg-primary rounded-pill px-3 py-1 font-modernMTPro">
                                   {relatedCategoryName}
                                 </span>
                               )}
@@ -406,9 +406,9 @@ const BlogDetailPage = () => {
                                 {formatDate(relatedBlog.created_at)}
                               </small>
                             </div>
-                            <h5 className="card-title fw-bold mb-3">
+                            <h4 className="card-title mb-3 font-modernMTPro">
                               {relatedBlog.title}
-                            </h5>
+                            </h4>
                             <div
                               className="card-text text-muted mb-3"
                               style={{
@@ -424,9 +424,9 @@ const BlogDetailPage = () => {
                             />
                             <Link
                               href={`/blog/${relatedBlog.slug}`}
-                              className="btn btn-link text-primary p-0 text-decoration-none fw-semibold"
+                              className="btn btn-link text-dark p-0 text-decoration-none font-modernMTPro"
                             >
-                              Read More →
+                              Read More <i className="fa fa-arrow-right ms-2"></i>
                             </Link>
                           </div>
                         </div>
@@ -440,24 +440,24 @@ const BlogDetailPage = () => {
         )}
 
         {/* Navigation Buttons */}
-        <div className="container-fluid py-5">
-          <div className="row justify-content-center">
-            <div className="col-lg-8">
+        <div className="container py-5">
+          <div className="row">
+            <div className="col-lg-12">
               <div className="d-flex justify-content-between">
                 <Link
                   href="/blogs"
-                  className="button header-btn-bg header-btn-text px-4 py-2"
+                  className="btn btn-outline-dark fw-normal px-4 py-2 font-modernMTPro"
                 >
-                  ← Back to All Blogs
+                   Back to All Blogs <i className="fa fa-arrow-left ms-2"></i>
                 </Link>
 
                 <button
                   onClick={() =>
                     window.scrollTo({ top: 0, behavior: "smooth" })
                   }
-                  className="button header-btn-bg header-btn-text fw-normal px-4 py-2"
+                  className="btn btn-outline-dark fw-normal px-4 py-2 font-modernMTPro"
                 >
-                  ↑ Back to Top
+                   Back to Top <i className="fa fa-arrow-up ms-2"></i> 
                 </button>
               </div>
             </div>

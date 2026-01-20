@@ -297,10 +297,10 @@
                   {(selectedCategories.length > 0 || selectedTags.length > 0) && (
                     <div className="mb-5">
                       <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h5 className="fw-bold mb-0 text-dark">Active Filters</h5>
+                        <h5 className="mb-0 text-dark font-modernMTPro">Active Filters</h5>
                         <button
                           onClick={clearFilters}
-                          className="button button-secondary btn-sm"
+                          className="btn d-flex align-items-center justify-content-center btn-outline-dark btn-sm font-modernMTPro"
                         >
                           Clear All
                         </button>
@@ -368,7 +368,7 @@
                   {/* Tags */}
                   {tags.length > 0 && (
                     <div className="mb-4">
-                      <h5 className="fw-bold mb-3 text-dark">Tags</h5>
+                      <h5 className="font-modernMTPro mb-3 text-dark">Tags</h5>
                       <div className="filter-options">
                         {tags.map((tag) => (
                           <button
@@ -678,11 +678,7 @@
             display: inline-flex;
             align-items: center;
             padding: 6px 12px;
-            background: linear-gradient(
-              135deg,
-              var(--primary) 0%,
-              var(--primary) 100%
-            );
+            background: #000;
             color: white;
             border-radius: 20px;
             font-size: 13px;
