@@ -100,7 +100,7 @@ const CategoryWiseBlog = ({ data = null }) => {
             {category.blogs.length === 0 ? (
               <p className="text-muted">No blogs in this category</p>
             ) : (
-              <div className="row g-4">
+              <div className="ro g-4">
                 {isEven ? (
                   <>
                     {/* Layout 0 */}
@@ -254,6 +254,7 @@ const CategoryWiseBlog = ({ data = null }) => {
                 ) : (
                   <>
                     {/* Layout 1 */}
+                    <div className="row">
                     {category.blogs.map((blog) => (
                       <div key={blog.id} className="col-lg-4 col-md-6">
                         <div className="card rounded-0 border-0 h-100">
@@ -295,6 +296,7 @@ const CategoryWiseBlog = ({ data = null }) => {
                         </div>
                       </div>
                     ))}
+                    </div>
                   </>
                 )}
               </div>

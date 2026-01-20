@@ -373,11 +373,11 @@ const Footer4 = ({ data }) => {
           }
 
           .footer-title {
-            font-size: 12px;
+            font-size: 16px;
           }
 
           .footer-link {
-            font-size: 12px;
+            font-size: 12px !important;
           }
         }
       `}</style>

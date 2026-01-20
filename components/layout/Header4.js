@@ -44,7 +44,7 @@ const Header2 = ({ data, category, season, coupons, country }) => {
         <div className="container">
           <div className="row w-100">
             <div className="col-12 d-flex justify-content-center">
-              <Link href="/" className="navbar-brand">
+              <Link href="/" className="navbar-brand mx-auto">
                 <Image
                   src={data?.url + "/" + data?.logo?.header || logo}
                   alt="Logo"
@@ -61,7 +61,7 @@ const Header2 = ({ data, category, season, coupons, country }) => {
       {/* ROW 2 — SEARCH BAR */}
       <nav className="navbar bg-header py-0">
         <div className="container-fluid">
-          <div className="row w-100 justify-content-end position-relative">
+          <div className="row w-100 mx-auto justify-content-end position-relative">
             <div className="col-md-4 col-12 position-relative">
               <div className="input-group input-group-sm">
                 <input
@@ -115,9 +115,9 @@ const Header2 = ({ data, category, season, coupons, country }) => {
 
       {/* ROW 3 — MENU */}
       <nav className="navbar navbar-expand-lg bg-white py-0 bordertop">
-        <div className="container">
+        <div className="container justify-content-center">
           <button
-            className="navbar-toggler shadow-none"
+            className="navbar-toggler shadow-none my-2"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#mainMenu"
