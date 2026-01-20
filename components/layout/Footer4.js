@@ -53,11 +53,11 @@ const Footer4 = ({ data }) => {
 
   return (
     <footer className="bg-footer">
-      <div className="footer-container">
+      <div className="container">
         {/* Main Footer Content */}
         <div className="row">
            <div className="col-md-4">
-              <h3 className="footer-title text-footer">Trending</h3>
+              <h3 className="footer-title text-footer font-modernMTPro">Trending</h3>
               <ul className="footer-links">
                 {TRENDING_BLOGS.map((blogs, linkIndex) => (
                   <li key={blogs.id}>
@@ -71,7 +71,7 @@ const Footer4 = ({ data }) => {
           {/* Dynamic Columns from JSON */}
           {FOOTER_CONFIG?.columns.map((column, columnIndex) => (
             <div key={columnIndex} className="col-md-2">
-              <h3 className="footer-title text-footer">{column.title}</h3>
+              <h3 className="footer-title text-footer font-modernMTPro  ">{column.title}</h3>
               <ul className="footer-links">
                 {column.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
@@ -86,7 +86,7 @@ const Footer4 = ({ data }) => {
 
           {/* Newsletter Column */}
           <div className="col-md-4 newsletter-column">
-            <h3 className="newsletter-title text-footer">
+            <h3 className="newsletter-title text-footer font-modernMTPro">
               {FOOTER_CONFIG?.newsletter.title}
             </h3>
 
@@ -164,7 +164,7 @@ const Footer4 = ({ data }) => {
         }
 
         .footer-container {
-          max-width: 1400px;
+          /* max-width: 1400px; */
           margin: 0 auto;
           padding: 0 40px;
         }

@@ -63,7 +63,18 @@
 html {
   min-height: 100vh;
 }
-
+.font-neuzeit-grotesk {
+  font-family: "neuzeit-grotesk", sans-serif;
+}
+.font-calibri {
+  font-family: "calibri", sans-serif;
+}
+.font-romie-r {
+  font-family: "romie-r", sans-serif;
+}
+.font-modernMTPro {
+  font-family: "modernMTPro", sans-serif;
+}
 html,
 body {
   max-width: 100vw;
@@ -72,6 +83,7 @@ body {
   /* background-color: var(--body-bg); */
   font-family: var(--font-family-body);
 }
+
 h1,
 h2,
 h3,
@@ -1156,4 +1168,39 @@ div.list-group > a {
   margin-bottom: 10px;
   color: #555;
   font-size: 14px;
+}
+
+.blog-category-block-header-moderno {
+  /* font-size: 5rem; */
+  /* font-weight: 700; */
+  /* margin-bottom: 16px; */
+  padding-top: 2rem;
+  
+  padding-bottom: 2rem;
+  border-top: 0.0625rem solid black;
+}
+.layout-index-0 .blog-category-block-header-moderno {
+  border-top: none;
+}
+.blog-category-block-header-moderno h2 {
+  font-size: 5rem;
+}
+.author-name {
+  font-size: 12px;
+  font-weight: 400;
+  color: #555;
+  font-family: "neuzeit-grotesk" !important;
+  text-transform: uppercase;
+}
+.sideblog-card {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #000;
+}
+.sideblog-card:last-child {
+  border-bottom: none;
+}
+@media (min-width: 1200px) {
+  .container, .container-lg, .container-md, .container-sm, .container-xl {
+      max-width: 1240px !important;
+  }
 }

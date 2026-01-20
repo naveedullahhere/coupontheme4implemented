@@ -8,7 +8,7 @@ import {
 import Spinner from "./Spinner";
 
 const CategoryWiseBlog = ({ data = null }) => {
-  const [blogs, setBlogs] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [imageBaseUrl, setImageBaseUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,20 +19,19 @@ const CategoryWiseBlog = ({ data = null }) => {
       setError(null);
 
       const response = await fetch(
-        `${APP_URL}api/v1/blogs?key=${APP_KEY}&type=featured`
+        `${APP_URL}api/v1/category-wise-blogs?key=${APP_KEY}&type=featured`
       );
 
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
 
       const result = await response.json();
-      setBlogs(result?.data || []);
+      setCategories(result?.data || []);
       setImageBaseUrl(result?.url || "");
     } catch (err) {
       console.error("Error fetching blogs:", err);
       setError("Failed to load blogs. Please try again later.");
-      setBlogs([]);
+      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -42,136 +41,16 @@ const CategoryWiseBlog = ({ data = null }) => {
     fetchBlogs();
   }, [fetchBlogs]);
 
-  // Blog Card Component for reusability
-  const BlogCard = ({ blog, isStyle4 = false }) => {
-    const imageUrl = blog.image
-      ? `${imageBaseUrl}/${blog.image}`
-      : "/assets/no-image.jpg";
-
-    const formattedDate = blog.created_at
-      ? new Date(blog.created_at).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })
-      : "N/A";
-
-    if (isStyle4) {
-      return (
-        <div className="col-lg-4 col-md-6 mb-4">
-          <div className="card h-100 border-0 rounded-0 shadow-hover">
-            <div
-              className="position-relative overflow-hidden"
-              style={{ height: "250px" }}
-            >
-              <Image
-                src={imageUrl}
-                alt={blog.title}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="card-img-top rounded-0 object-fit-cover"
-                priority={false}
-              />
-            </div>
-
-            <div className="card-body d-flex flex-column p-4">
-              <h3 className="card-title fw-semibold fs-6 mb-3 text-dark">
-                <Link href={`/blog/${blog.slug}`} className="text-decoration-none text-dark">
-                  {blog.title}
-                </Link>
-              </h3>
-
-              <div className="flex-grow-1 mb-3">
-                <div
-                  className="text-dark lh-base fs-6"
-                  style={{
-                    fontWeight: 400,
-                    lineHeight: 1.6,
-                    display: "-webkit-box",
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                  }}
-                  dangerouslySetInnerHTML={{ __html: blog.short_description }}
-                />
-              </div>
-
-              <div className="d-flex align-items-center justify-content-between pt-3 border-top">
-                <span className="text-muted small">{formattedDate}</span>
-                <Link
-                  href={`/blog/${blog.slug}`}
-                  className="text-decoration-none fw-semibold text-dark small"
-                >
-                  Read More →
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Default Style
-    return (
-      <div className="col-md-4 mb-4">
-        <div className="card h-100 rounded-0 border shadow-sm">
-          <div className="position-relative" style={{ height: "200px" }}>
-            <Image
-              src={imageUrl}
-              alt={blog.title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="card-img-top object-fit-cover"
-              priority={false}
-            />
-          </div>
-
-          <div className="card-body d-flex flex-column">
-            <h5 className="card-title fw-bold mb-3">
-              <Link href={`/blog/${blog.slug}`} className="text-decoration-none text-dark">
-                {blog.title}
-              </Link>
-            </h5>
-
-            <div className="flex-grow-1 mb-3">
-              <div
-                className="text-muted"
-                style={{
-                  display: "-webkit-box",
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
-                }}
-                dangerouslySetInnerHTML={{ __html: blog.short_description }}
-              />
-            </div>
-
-            <div className="d-flex align-items-center justify-content-between mt-auto">
-              <span className="text-muted small">{formattedDate}</span>
-              <Link
-                href={`/blog/${blog.slug}`}
-                className="btn btn-primary btn-sm rounded-0"
-              >
-                Read More
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  if (loading) {
+  if (loading)
     return (
       <div className="min-vh-50 d-flex justify-content-center align-items-center">
         <Spinner />
       </div>
     );
-  }
 
-  if (error) {
+  if (error)
     return (
-      <div className="container-fluid my-3">
+      <div className="container my-3">
         <div className="alert alert-danger text-center" role="alert">
           {error}
           <button onClick={fetchBlogs} className="btn btn-link p-0 ms-2">
@@ -180,9 +59,8 @@ const CategoryWiseBlog = ({ data = null }) => {
         </div>
       </div>
     );
-  }
 
-  if (blogs.length === 0) {
+  if (categories.length === 0)
     return (
       <div className="container-fluid my-3">
         <div className="text-center py-5">
@@ -190,15 +68,240 @@ const CategoryWiseBlog = ({ data = null }) => {
         </div>
       </div>
     );
-  }
 
   return (
-    <div className="container-fluid my-3">
-      <div className="row g-4">
-        {blogs.map((blog) => (
-          <BlogCard key={blog.id} blog={blog} isStyle4={data?.Style == 4} />
-        ))}
-      </div>
+    <div className="container my-3">
+      {categories.map((category, index) => {
+        // Even index -> layout 0, Odd index -> layout 1
+        const isEven = index % 2 === 0;
+
+        return (
+          <div
+            key={category.id}
+            className={`mb-5 layout-index-${index} layout-${
+              isEven ? "even" : "odd"
+            }`}
+          >
+            <div className="row align-items-center blog-category-block-header-moderno">
+              <div className="col-lg-9">
+                <h2 className="text-dark font-modernMTPro">{category.name}</h2>
+              </div>
+              <div className="col-lg-3 text-lg-end">
+                <Link
+                  href={`/blogs/${category.slug}`}
+                  className="text-decoration-none text-dark font-modernMTPro"
+                >
+                  <span className="text-dark">View All</span>
+                  <i className="fa fa-arrow-right ms-2"></i>
+                </Link>
+              </div>
+            </div>
+
+            {category.blogs.length === 0 ? (
+              <p className="text-muted">No blogs in this category</p>
+            ) : (
+              <div className="row g-4">
+                {isEven ? (
+                  <>
+                    {/* Layout 0 */}
+                    <div className="row">
+                      <div className="col-lg-8">
+                        {category.blogs.slice(0, 1).map((blog) => (
+                          <div
+                            key={blog.id}
+                            className="card rounded-0 border-0 mb-3"
+                          >
+                            <div
+                              className="position-relative"
+                              style={{ height: "350px" }}
+                            >
+                              <Image
+                                src={
+                                  blog.image
+                                    ? `${imageBaseUrl}${blog.image}`
+                                    : "/assets/no-image.jpg"
+                                }
+                                alt={blog.title}
+                                fill
+                                className="object-fit-cover"
+                              />
+                            </div>
+                            <div className="card-body px-0">
+                              <h1 className="fw font-modernMTPro m-0">
+                                <Link
+                                  href={`/blog/${blog.slug}`}
+                                  className="font-modernMTPro text-decoration-none text-dark"
+                                >
+                                  {blog.title}
+                                </Link>
+                              </h1>
+                              <div
+                                className="text-muted"
+                                dangerouslySetInnerHTML={{
+                                  __html: blog.short_description,
+                                }}
+                              />
+                              <div className="text-muted author-name">
+                                <span className="text-muted text-uppercase">
+                                  BY:{" "}
+                                  <span className="text-dark">
+                                    {blog.author_name
+                                      ? blog.author_name
+                                      : "Unknown"}
+                                  </span>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="col-lg-4">
+                        <div className="row g-2">
+                          {category.blogs.slice(1, 4).map((blog) => (
+                            <div key={blog.id} className="col-12 sideblog-card">
+                              <div className="card rounded-0 border-0">
+                                <div className="card-body p-0">
+                                  <div className="row">
+                                    <div className="col-5">
+                                      <Image
+                                        src={
+                                          blog.image
+                                            ? `${imageBaseUrl}${blog.image}`
+                                            : "/assets/no-image.jpg"
+                                        }
+                                        alt={blog.title}
+                                        width={100}
+                                        height={150}
+                                        className="object-fit-cover w-100"
+                                      />
+                                    </div>
+                                    <div className="col-7">
+                                      <h5 className="mb-1 font-modernMTPro">
+                                        <Link
+                                          href={`/blog/${blog.slug}`}
+                                          className="font-modernMTPro text-decoration-none text-dark"
+                                        >
+                                          {blog.title}
+                                        </Link>
+                                      </h5>
+                                      <div className="text-muted  author-name">
+                                        <span className="text-muted text-uppercase">
+                                          BY:{" "}
+                                          <span className="text-dark">
+                                            {blog.author_name
+                                              ? blog.author_name
+                                              : "Unknown"}
+                                          </span>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {category.blogs.length > 4 && (
+                      <div className="row g-4 mt-3">
+                        {category.blogs.slice(4).map((blog) => (
+                          <div key={blog.id} className="col-lg-4 col-md-6">
+                            <div className="card rounded-0 border-0 h-100">
+                              <div
+                                className="position-relative"
+                                style={{ height: "200px" }}
+                              >
+                                <Image
+                                  src={
+                                    blog.image
+                                      ? `${imageBaseUrl}${blog.image}`
+                                      : "/assets/no-image.jpg"
+                                  }
+                                  alt={blog.title}
+                                  fill
+                                  className="object-fit-cover"
+                                />
+                              </div>
+                              <div className="card-body px-0">
+                                <h5 className="font-modernMTPro">
+                                  <Link
+                                    href={`/blog/${blog.slug}`}
+                                    className="text-decoration-none text-dark"
+                                  >
+                                    {blog.title}
+                                  </Link>
+                                </h5>
+                                <div className="text-muted  author-name">
+                                  <span className="text-muted text-uppercase">
+                                    BY:{" "}
+                                    <span className="text-dark">
+                                      {blog.author_name
+                                        ? blog.author_name
+                                        : "Unknown"}
+                                    </span>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {/* Layout 1 */}
+                    {category.blogs.map((blog) => (
+                      <div key={blog.id} className="col-lg-4 col-md-6">
+                        <div className="card rounded-0 border-0 h-100">
+                          <div
+                            className="position-relative"
+                            style={{ height: "200px" }}
+                          >
+                            <Image
+                              src={
+                                blog.image
+                                  ? `${imageBaseUrl}${blog.image}`
+                                  : "/assets/no-image.jpg"
+                              }
+                              alt={blog.title}
+                              fill
+                              className="object-fit-cover"
+                            />
+                          </div>
+                          <div className="card-body px-0">
+                            <h4 className="font-modernMTPro">
+                              <Link
+                                href={`/blog/${blog.slug}`}
+                                className="font-modernMTPro text-decoration-none text-dark"
+                              >
+                                {blog.title}
+                              </Link>
+                            </h4>
+                            <div className="text-muted ">
+                              <span className="text-muted text-uppercase author-name  ">
+                                BY:{" "}
+                                <span className="text-dark">
+                                  {blog.author_name
+                                    ? blog.author_name
+                                    : "Unknown"}
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
