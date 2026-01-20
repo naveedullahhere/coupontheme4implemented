@@ -257,7 +257,7 @@ const BlogDetailPage = () => {
                 </div>
 
                 {/* Featured Image */}
-                <div className="featured-image-container position-relative rounded-4 overflow-hidden shadow-lg">
+                <div className="featured-image-container position-relative rounded-0 overflow-hidden shadow-lg">
                   <div style={{ height: "500px" }}>
                     <Image
                       src={imageUrl}
