@@ -494,9 +494,11 @@ const BlogDetailPage = () => {
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
         }
         .long-description img {
-          width: 75%;
+          width: 100%;
+          height: 500px;
+          object-position: left;
           object-fit: contain;
-          height: auto;
+          // height: auto;
         }
         .content-styles h2,
         .content-styles h3,
