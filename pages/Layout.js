@@ -49,10 +49,10 @@ const Layout = ({
         <meta name="keywords" content={metaKeywords} />
         <meta name="description" content={metaDescription} />
 
-        <link rel="canonical" href={APP_URL} />
+        <link rel="canonical" href={process.env.NEXT_PUBLIC_APP_URL} />
 
         <meta property="og:site_name" content={DEFAULT_TITLE} />
-        <meta property="og:url" content={APP_URL} />
+        <meta property="og:url" content={process.env.NEXT_PUBLIC_APP_URL} />
         <meta property="og:title" content={metaTitle} />
         <meta property="og:type" content="website" />
         <meta property="og:description" content={metaDescription} />

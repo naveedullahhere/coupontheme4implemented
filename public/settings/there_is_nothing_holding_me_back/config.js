@@ -1,6 +1,6 @@
 module.exports = {
-  // NEXT_PUBLIC_APP_URL: 'https://helloluvvy.com',
-  NEXT_PUBLIC_APP_URL: 'localhost:3000',
+  NEXT_PUBLIC_APP_URL: 'https://helloluvvy.com',
+  // NEXT_PUBLIC_APP_URL: 'localhost:3000',
   APP_URL: "https://creativeitsols.com/system/public/",
   APP_KEY: "app_yZWYqQoDaeNDpe6YXZS3hiKcxN20vq0KQDCifCXm",
   DEFAULT_TITLE: "Coupon Codes",
