@@ -21,181 +21,247 @@ const Toaster = dynamic(
   () => import("react-hot-toast").then((c) => c.Toaster),
   {
     ssr: false,
-  }
+  },
 );
 
-export default function App({ Component, pageProps }) {
-  const [data, setData] = useState([]);
+export default function App({ Component, pageProps, themeData, initialMetas }) {
+  const [data, setData] = useState(themeData || {});
+  const [loading, setLoading] = useState(!themeData);
   const [err, setErr] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [category, setcategory] = useState();
-  const [season, setseason] = useState();
-  const [coupons, setcoupons] = useState();
-  const [country, setcountry] = useState();
-  const [metas, setMetas] = useState({
-    title: data?.siteTitle ? data?.siteTitle : "Home",
-    metaTitle: data?.siteTitle ? data?.siteTitle : "",
-    metaDescription: `${data?.meta ? data?.meta?.description : ""}`,
-    metaKeyword: `${data?.meta ? data?.meta?.keywords : "More Coupon Codes"}`,
-  });
+  const [metas, setMetas] = useState(
+    initialMetas || {
+      title: "Home",
+      metaTitle: "",
+      metaDescription: "More Coupon Codes",
+      metaKeyword: "More Coupon Codes",
+    },
+  );
 
   useEffect(() => {
-    async function fetchData() {
-      const response = await fetch("/settings/data.json");
-      const theme = await response.json();
+    if (!themeData && typeof window !== "undefined") {
+      async function fetchData() {
+        try {
+          setLoading(true);
+          const response = await fetch("/settings/data.json");
+          if (!response.ok) {
+            throw new Error("Failed to fetch data");
+          }
+          const theme = await response.json();
+          setData(theme);
 
-      setData(theme);
-      setcategory(theme?.category);
-      setcoupons(theme?.type);
-      setseason(theme?.season);
-      setcountry(theme?.country);
-      setLoading(false);
+          setMetas({
+            title: theme?.siteTitle ? theme?.siteTitle : "Home",
+            metaTitle: theme?.siteTitle ? theme?.siteTitle : "",
+            metaDescription: `${theme?.meta ? theme?.meta?.description : "More Coupon Codes"}`,
+            metaKeyword: `${theme?.meta ? theme?.meta?.keywords : "More Coupon Codes"}`,
+          });
+
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setErr(true);
+          setLoading(false);
+        }
+      }
+      fetchData();
     }
-    fetchData();
-  }, []);
+  }, [themeData]);
 
-  if (loading)
+  if (loading && !themeData) {
     return (
       <Layout
-        title={`${data?.siteTitle ? data?.siteTitle : "Home"}`}
-        metaTitle={`${data?.siteTitle ? data?.siteTitle : "Home"}`}
-        metaDescription={`${
-          data?.meta ? data?.meta?.description : "More Coupon Codes"
-        }`}
+        title={`Loading...`}
+        metaTitle={`Loading...`}
+        metaDescription={`Loading...`}
         logo=""
-        metaKeywords={`${
-          data?.meta ? data?.meta?.keywords : "More Coupon Codes"
-        }`}
+        metaKeywords={`Loading...`}
       >
         <div className="bg-white vh-100 vw-100 d-flex justify-content-center align-items-center">
           <Spinner />
         </div>
       </Layout>
     );
-  if (err)
+  }
+
+  if (err && !themeData) {
     return (
       <div className="text-center error my-auto vw-100 vh-100 d-flex justify-content-center align-items-center">
         Something went wrong!
       </div>
     );
-  else {
-    return (
-      <>
-        <Head>
-          {data?.head_scripts && (
-            <script
-              dangerouslySetInnerHTML={{
-                __html: data.head_scripts
-                  .replace(/<script>/gi, "")
-                  .replace(/<\/script>/gi, "")
-                  .trim(),
-              }}
+  }
+
+  const currentData = themeData || data;
+
+  return (
+    <>
+      <Head>
+        <title>{metas.title}</title>
+        <meta name="description" content={metas.metaDescription} />
+        <meta name="keywords" content={metas.metaKeyword} />
+
+        {currentData?.head_scripts && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: currentData.head_scripts
+                .replace(/<script>/gi, "")
+                .replace(/<\/script>/gi, "")
+                .trim(),
+            }}
+          />
+        )}
+      </Head>
+
+      <style jsx global>
+        {`
+          :root {
+            --primary: ${currentData?.color?.primary || "green"};
+            --secondary: ${currentData?.color?.secondary || "#1b96b8"};
+            --header: ${currentData?.header?.background || "blue"};
+            --header-text: ${currentData?.header?.color || "white"};
+            --header-btn-bg: ${currentData?.header?.button_background ||
+            "white"};
+            --header-btn-text: ${currentData?.header?.button_color || "white"};
+            --footer-bg: ${currentData?.footer?.background || "blue"};
+            --footer-text: ${currentData?.footer?.color || "white"};
+            --body-bg: ${currentData?.Style === 4 ? "#ffffff" : "#eeee"};
+            --font-family-body: ${currentData?.Style === 4
+              ? "neuzeit-grotesk, Calibri"
+              : "Calibri"};
+            --font-family-heading: ${currentData?.Style === 4
+              ? "neuzeit-grotesk"
+              : "Calibri"};
+          }
+        `}
+      </style>
+
+      <div
+        className={`_element ${
+          CONTAINER_TYPE === "wide" ? "wide" : "none-wide"
+        }`}
+      >
+        <Layout
+          title={metas.title}
+          metaTitle={metas.metaTitle}
+          metaDescription={metas.metaDescription}
+          logo=""
+          metaKeywords={metas.metaKeyword}
+        >
+          {currentData?.Style === 1 && (
+            <Header1
+              data={currentData}
+              category={currentData?.category}
+              season={currentData?.season}
+              coupons={currentData?.type}
+              country={currentData?.country}
             />
           )}
-        </Head>
-
-        <style jsx global>
-          {`
-            :root {
-              --primary: ${data?.color?.primary || "green"};
-              --secondary: ${data?.color?.secondary || "#1b96b8"};
-              --header: ${data?.header?.background || "blue"};
-              --header-text: ${data?.header?.color || "white"};
-              --header-btn-bg: ${data?.header?.button_background || "white"};
-              --header-btn-text: ${data?.header?.button_color || "white"};
-              --footer-bg: ${data?.footer?.background || "blue"};
-              --footer-text: ${data?.footer?.color || "white"};
-              --body-bg: ${data.Style === 4 ? "#ffffff" : "#eeee"};
-              --font-family-body: ${data.Style === 4
-                ? "neuzeit-grotesk, Calibri"
-                : "Calibri"};
-              --font-family-heading: ${data.Style === 4
-                ? "neuzeit-grotesk"
-                : "Calibri"};
-            }
-          `}
-        </style>
-
-        <div
-          className={`_element ${
-            CONTAINER_TYPE === "wide" ? "wide" : "none-wide"
-          }`}
-        >
-          <Layout
-            title={`${metas.title}`}
-            metaTitle={`${metas.metaTitle}`}
-            metaDescription={metas.metaDescription}
-            logo=""
-            metaKeywords={metas.metaKeyword}
-          >
-            {data.Style === 1 && (
-              <Header1
-                data={data}
-                category={category}
-                season={season}
-                coupons={coupons}
-                country={country}
+          {currentData?.Style === 2 && (
+            <Header2
+              data={currentData}
+              category={currentData?.category}
+              season={currentData?.season}
+              coupons={currentData?.type}
+              country={currentData?.country}
+            />
+          )}
+          {currentData?.Style === 4 && (
+            <Header4
+              data={currentData}
+              category={currentData?.category}
+              season={currentData?.season}
+              coupons={currentData?.type}
+              country={currentData?.country}
+            />
+          )}
+          <div className={`min-vh-90`}>
+            <Component
+              {...pageProps}
+              data={currentData}
+              metas={metas}
+              setMetas={setMetas}
+            />
+          </div>
+          <Toaster position="top-right" />
+          {currentData?.Style === 1 && (
+            <Footer1
+              data={currentData}
+              category={currentData?.category}
+              season={currentData?.season}
+              coupons={currentData?.type}
+              country={currentData?.country}
+            />
+          )}
+          {currentData?.Style === 2 && (
+            <Footer2
+              data={currentData}
+              category={currentData?.category}
+              season={currentData?.season}
+              coupons={currentData?.type}
+              country={currentData?.country}
+            />
+          )}
+          {currentData?.Style === 4 && (
+            <>
+              <Footer4
+                data={currentData}
+                category={currentData?.category}
+                season={currentData?.season}
+                coupons={currentData?.type}
+                country={currentData?.country}
               />
-            )}
-            {data.Style === 2 && (
-              <Header2
-                data={data}
-                category={category}
-                season={season}
-                coupons={coupons}
-                country={country}
-              />
-            )}
-            {data.Style === 4 && (
-              <Header4
-                data={data}
-                category={category}
-                season={season}
-                coupons={coupons}
-                country={country}
-              />
-            )}
-            <div className={`min-vh-90`}>
-              <Component
-                {...pageProps}
-                data={data}
-                metas={metas}
-                setMetas={setMetas}
-              />
-            </div>
-            <Toaster position="top-right" />
-            {data.Style === 1 && (
-              <Footer1
-                data={data}
-                category={category}
-                season={season}
-                coupons={coupons}
-                country={country}
-              />
-            )}
-            {data.Style === 2 && (
-              <Footer2
-                data={data}
-                category={category}
-                season={season}
-                coupons={coupons}
-                country={country}
-              />
-            )}
-            {data.Style === 4 && (
-              <>
-                <Footer4
-                  data={data}
-                  category={category}
-                  season={season}
-                  coupons={coupons}
-                  country={country}
-                />
-              </>
-            )}
-          </Layout>
-        </div>
-      </>
-    );
-  }
+            </>
+          )}
+        </Layout>
+      </div>
+    </>
+  );
 }
+
+App.getInitialProps = async ({ Component, ctx }) => {
+  let pageProps = {};
+  let themeData = null;
+  let initialMetas = null;
+
+  if (typeof window === "undefined") {
+    try {
+      const fs = await import("fs");
+      const path = await import("path");
+
+      const filePath = path.join(
+        process.cwd(),
+        "public",
+        "settings",
+        "data.json",
+      );
+      const fileContents = fs.readFileSync(filePath, "utf8");
+      themeData = JSON.parse(fileContents);
+
+      initialMetas = {
+        title: themeData?.siteTitle ? themeData?.siteTitle : "Home",
+        metaTitle: themeData?.siteTitle ? themeData?.siteTitle : "",
+        metaDescription: `${themeData?.meta ? themeData?.meta?.description : "More Coupon Codes"}`,
+        metaKeyword: `${themeData?.meta ? themeData?.meta?.keywords : "More Coupon Codes"}`,
+      };
+    } catch (error) {
+      console.error("Error reading data.json on server:", error);
+      themeData = {};
+      initialMetas = {
+        title: "Home",
+        metaTitle: "",
+        metaDescription: "More Coupon Codes",
+        metaKeyword: "More Coupon Codes",
+      };
+    }
+  }
+
+  if (Component.getInitialProps) {
+    pageProps = await Component.getInitialProps(ctx);
+  }
+
+  return {
+    pageProps,
+    themeData,
+    initialMetas,
+  };
+};
