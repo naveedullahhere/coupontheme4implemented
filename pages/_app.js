@@ -16,6 +16,7 @@ import Header4 from "@/components/layout/Header4";
 import Footer4 from "@/components/layout/Footer4";
 import "@/public/fonts/font-dec.css";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 const Toaster = dynamic(
   () => import("react-hot-toast").then((c) => c.Toaster),
@@ -25,6 +26,7 @@ const Toaster = dynamic(
 );
 
 export default function App({ Component, pageProps }) {
+  const router = useRouter();
   const [data, setData] = useState([]);
   const [err, setErr] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -32,12 +34,20 @@ export default function App({ Component, pageProps }) {
   const [season, setseason] = useState();
   const [coupons, setcoupons] = useState();
   const [country, setcountry] = useState();
+  
+  // Initialize metas with serverData if available (for server-side rendering)
+  const serverData = pageProps?.serverData;
   const [metas, setMetas] = useState({
-    title: data?.siteTitle ? data?.siteTitle : "Home",
-    metaTitle: data?.siteTitle ? data?.siteTitle : "",
-    metaDescription: `${data?.meta ? data?.meta?.description : ""}`,
-    metaKeyword: `${data?.meta ? data?.meta?.keywords : "More Coupon Codes"}`,
+    title: serverData?.siteTitle || "Home",
+    metaTitle: serverData?.meta?.title || serverData?.siteTitle || "",
+    metaDescription: serverData?.meta?.description || "",
+    metaKeyword: serverData?.meta?.keywords || "More Coupon Codes",
   });
+  
+  // Check if current page is home page (has its own Head with meta tags)
+  // During SSR, router.pathname might not be available, so check pageProps.serverData
+  // If serverData exists, it means getServerSideProps ran, which only happens on home page
+  const isHomePage = pageProps?.serverData !== undefined || router.pathname === '/';
 
   useEffect(() => {
     async function fetchData() {
@@ -50,6 +60,16 @@ export default function App({ Component, pageProps }) {
       setseason(theme?.season);
       setcountry(theme?.country);
       setLoading(false);
+      
+      // Update metas with serverData if available (for initial server-side render)
+      if (serverData) {
+        setMetas({
+          title: serverData?.siteTitle || "Home",
+          metaTitle: serverData?.meta?.title || serverData?.siteTitle || "",
+          metaDescription: serverData?.meta?.description || "",
+          metaKeyword: serverData?.meta?.keywords || "More Coupon Codes",
+        });
+      }
     }
     fetchData();
   }, []);
@@ -127,6 +147,7 @@ export default function App({ Component, pageProps }) {
             metaDescription={metas.metaDescription}
             logo=""
             metaKeywords={metas.metaKeyword}
+            skipMetaTags={isHomePage}
           >
             {data.Style === 1 && (
               <Header1

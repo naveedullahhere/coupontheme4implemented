@@ -29,6 +29,7 @@
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategoryName, setSelectedCategoryName] = useState("");
     const [hasInitialized, setHasInitialized] = useState(false);
+    const [categoriesWithBlogs, setCategoriesWithBlogs] = useState([]);
 
     // Fetch filter options (categories and tags)
     useEffect(() => {
@@ -44,6 +45,44 @@
               const categoriesData = result.data.categories || [];
               setCategories(categoriesData);
               setTags(result.data.tags || []);
+
+              // Filter categories that have blogs (parallel requests for better performance)
+              const checkCategoriesWithBlogs = async () => {
+                try {
+                  // Make parallel requests for all categories
+                  const categoryChecks = categoriesData.map(async (category) => {
+                    try {
+                      const blogResponse = await fetch(
+                        `${APP_URL}api/v1/blogs?key=${APP_KEY}&type=featured&categories=${category.id}&page=1`
+                      );
+                      
+                      if (blogResponse.ok) {
+                        const blogResult = await blogResponse.json();
+                        if (blogResult.success && blogResult.data && blogResult.data.length > 0) {
+                          return category;
+                        }
+                      }
+                    } catch (err) {
+                      console.error(`Error checking category ${category.id}:`, err);
+                    }
+                    return null;
+                  });
+                  
+                  // Wait for all requests to complete
+                  const results = await Promise.all(categoryChecks);
+                  // Filter out null values (categories without blogs)
+                  const categoriesWithData = results.filter(cat => cat !== null);
+                  
+                  setCategoriesWithBlogs(categoriesWithData);
+                } catch (err) {
+                  console.error("Error checking categories:", err);
+                  // Fallback: show all categories if check fails
+                  setCategoriesWithBlogs(categoriesData);
+                }
+              };
+
+              // Check categories with blogs
+              checkCategoriesWithBlogs();
 
               if (actualCategorySlug) {
                 const categorySlugStr = Array.isArray(actualCategorySlug)
@@ -86,6 +125,8 @@
 
       try {
         setLoadingBlogs(true);
+        // Clear previous blogs immediately when starting new fetch
+        setBlogs([]);
 
         let apiUrl = `${APP_URL}api/v1/blogs?key=${APP_KEY}&type=featured&page=${currentPage}`;
 
@@ -109,14 +150,30 @@
         if (response.ok) {
           const result = await response.json();
           if (result.success) {
-            setBlogs(result.data || []);
+            // Always set blogs, even if empty array
+            const blogsData = result.data || [];
+            setBlogs(blogsData);
             setImageBaseUrl(result.url || "");
             setTotalPages(result.last_page || 1);
             setTotalBlogs(result.total || 0);
+          } else {
+            // If success is false, clear blogs
+            setBlogs([]);
+            setTotalPages(1);
+            setTotalBlogs(0);
           }
+        } else {
+          // If response is not ok, clear blogs
+          setBlogs([]);
+          setTotalPages(1);
+          setTotalBlogs(0);
         }
       } catch (err) {
         console.error("Error fetching blogs:", err);
+        // On error, clear blogs
+        setBlogs([]);
+        setTotalPages(1);
+        setTotalBlogs(0);
       } finally {
         setLoading(false);
         setLoadingBlogs(false);
@@ -135,7 +192,15 @@
       if (hasInitialized && categories.length > 0) {
         fetchBlogs();
       }
-    }, [fetchBlogs, hasInitialized, categories.length]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+      selectedCategories,
+      selectedTags,
+      currentPage,
+      searchQuery,
+      hasInitialized,
+      categories.length,
+    ]);
 
     // Handle category selection
     const handleCategoryToggle = (categoryId, categorySlug) => {
@@ -177,7 +242,11 @@
     const handleSearch = (e) => {
       e.preventDefault();
       setCurrentPage(1);
-      fetchBlogs();
+      // Note: fetchBlogs will be called by useEffect when currentPage or searchQuery changes
+      // But we call it here too to ensure immediate fetch if currentPage is already 1
+      if (hasInitialized && categories.length > 0) {
+        fetchBlogs();
+      }
     };
 
     // Handle page change
@@ -339,31 +408,48 @@
                   )}
 
                   {/* Categories */}
-                  {categories.length > 0 && (
-                    <div className="mb-5">
-                      <h5 className="font-modernMTPro mb-3 text-dark">Categories</h5>
-                      <div className="filter-options">
-                        {categories.map((category) => (
-                          <button
-                            key={category.id}
-                            className={`filter-option ${
-                              selectedCategories.includes(category.id)
-                                ? "active"
-                                : ""
-                            }`}
-                            onClick={() =>
-                              handleCategoryToggle(category.id, category.slug)
-                            }
-                          >
-                            {category.name}
-                            {selectedCategories.includes(category.id) && (
-                              <i className="bi bi-check-lg"></i>
-                            )}
-                          </button>
-                        ))}
+                  {(() => {
+                    // Include selected category even if it doesn't have blogs
+                    const categoriesToShow = [...categoriesWithBlogs];
+                    if (selectedCategories.length > 0) {
+                      selectedCategories.forEach((selectedCatId) => {
+                        const selectedCat = categories.find((c) => c.id === selectedCatId);
+                        if (
+                          selectedCat &&
+                          !categoriesToShow.find((c) => c.id === selectedCatId)
+                        ) {
+                          categoriesToShow.push(selectedCat);
+                        }
+                      });
+                    }
+                    
+                    return categoriesToShow.length > 0 ? (
+                      <div className="mb-5">
+                        <h5 className="font-modernMTPro mb-3 text-dark">Categories</h5>
+                        <div className="filter-options">
+                          {categoriesToShow.map((category) => {
+                            const isSelected = selectedCategories.includes(category.id);
+                            return (
+                              <button
+                                key={category.id}
+                                className={`filter-option ${
+                                  isSelected ? "active" : ""
+                                }`}
+                                onClick={() =>
+                                  handleCategoryToggle(category.id, category.slug)
+                                }
+                              >
+                                {category.name}
+                                {isSelected && (
+                                  <i className="bi bi-check-lg"></i>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    ) : null;
+                  })()}
 
                   {/* Tags */}
                   {tags.length > 0 && (
