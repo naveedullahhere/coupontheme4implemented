@@ -173,6 +173,7 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
               coupons={currentData?.type}
               country={currentData?.country}
             />
+            
           )}
           <div className={`min-vh-90`}>
             <Component
