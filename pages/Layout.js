@@ -8,33 +8,48 @@ const Layout = ({
   title = DEFAULT_TITLE,
   metaTitle = DEFAULT_TITLE,
   metaKeywords = "",
-  metaDescription = DEFAULT_DESC
+  metaDescription = DEFAULT_DESC,
+  themeData = null // Props se themeData receive karo
 }) => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(themeData);
 
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  async function fetchData() {
-    try {
-      const response = await fetch("/settings/data.json");
-      const theme = await response.json();
-      setData(theme);
-    } catch (err) {
-      console.error("Settings load error:", err);
+    // Agar server-side se data nahi aaya, toh client-side fetch karo
+    if (!data && typeof window !== 'undefined') {
+      async function fetchData() {
+        try {
+          const response = await fetch("/settings/data.json");
+          const theme = await response.json();
+          setData(theme);
+        } catch (err) {
+          console.error("Settings load error:", err);
+        }
+      }
+      fetchData();
     }
-  }
+  }, [data]);
 
   const favicon = data?.logo?.favicon
     ? `${data?.url}/${data.logo.favicon}`
-    : "/favicon.png"; // fallback
+    : "/favicon.png";
 
   return (
     <>
       <Head>
-        <title>{title}</title>
+        {/* Only set meta tags here if they are different from _app.js */}
+        {/* Default meta tags - specific page meta tags will override these */}
+        {!title && <title>{metaTitle}</title>}
+        {title && <title>{title}</title>}
+        
+        {metaDescription && (
+          <meta name="description" content={metaDescription} />
+        )}
+        
+        {metaKeywords && (
+          <meta name="keywords" content={metaKeywords} />
+        )}
 
+        {/* Favicon and other head elements */}
         <link rel="icon" type="image/png" sizes="32x32" href={favicon} />
         <link rel="shortcut icon" href={favicon} />
         <link rel="apple-touch-icon" href={favicon} />
@@ -45,21 +60,19 @@ const Layout = ({
         <link href="/bootstrap.min.css" rel="stylesheet" />
 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="title" content={metaTitle} />
-        <meta name="keywords" content={metaKeywords} />
-        <meta name="description" content={metaDescription} />
+        <meta name="title" content={metaTitle || title} />
 
         <link rel="canonical" href={NEXT_PUBLIC_APP_URL} />
 
-        <meta property="og:site_name" content={title} />
+        <meta property="og:site_name" content={metaTitle || title} />
         <meta property="og:url" content={NEXT_PUBLIC_APP_URL} />
-        <meta property="og:title" content={metaTitle} />
+        <meta property="og:title" content={metaTitle || title} />
         <meta property="og:type" content="website" />
         <meta property="og:description" content={metaDescription} />
         <meta property="og:image" content={favicon} />
         <meta property="og:image:type" content="image/png" />
 
-        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:title" content={metaTitle || title} />
         <meta name="twitter:description" content={metaDescription} />
 
         <meta

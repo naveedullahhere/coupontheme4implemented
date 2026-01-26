@@ -38,6 +38,7 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
   );
 
   useEffect(() => {
+    // Only fetch on client-side if server-side data not available
     if (!themeData && typeof window !== "undefined") {
       async function fetchData() {
         try {
@@ -49,6 +50,7 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
           const theme = await response.json();
           setData(theme);
 
+          // Update metas based on fetched data
           setMetas({
             title: theme?.siteTitle ? theme?.siteTitle : "Home",
             metaTitle: theme?.siteTitle ? theme?.siteTitle : "",
@@ -95,6 +97,7 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
 
   return (
     <>
+      {/* Main Layout component se pehle Head mein meta tags set karo */}
       <Head>
         <title>{metas.title}</title>
         <meta name="description" content={metas.metaDescription} />
@@ -140,12 +143,14 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
           CONTAINER_TYPE === "wide" ? "wide" : "none-wide"
         }`}
       >
+        {/* Layout component ko simplified props do */}
         <Layout
           title={metas.title}
           metaTitle={metas.metaTitle}
           metaDescription={metas.metaDescription}
           logo=""
           metaKeywords={metas.metaKeyword}
+          themeData={currentData}
         >
           {currentData?.Style === 1 && (
             <Header1
@@ -173,7 +178,6 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
               coupons={currentData?.type}
               country={currentData?.country}
             />
-            
           )}
           <div className={`min-vh-90`}>
             <Component
@@ -219,15 +223,18 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
   );
 }
 
+// Server-side data fetching using getInitialProps
 App.getInitialProps = async ({ Component, ctx }) => {
   let pageProps = {};
   let themeData = null;
   let initialMetas = null;
 
+  // Only fetch on server-side
   if (typeof window === "undefined") {
     try {
-      const fs = await import("fs");
-      const path = await import("path");
+      // Dynamic import for fs module (only on server)
+      const fs = (await import("fs")).default;
+      const path = (await import("path")).default;
 
       const filePath = path.join(
         process.cwd(),
@@ -246,6 +253,7 @@ App.getInitialProps = async ({ Component, ctx }) => {
       };
     } catch (error) {
       console.error("Error reading data.json on server:", error);
+      // Fallback to empty data
       themeData = {};
       initialMetas = {
         title: "Home",

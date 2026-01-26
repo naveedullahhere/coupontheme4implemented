@@ -1,4 +1,3 @@
-// pages/blog/[slug].js
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -10,7 +9,7 @@ import {
 } from "@/public/settings/there_is_nothing_holding_me_back/config";
 import Spinner from "@/components/Spinner";
 
-const BlogDetailPage = () => {
+const BlogDetailPage = ({ themeData }) => {
   const router = useRouter();
   const { slug } = router.query;
 
@@ -31,7 +30,7 @@ const BlogDetailPage = () => {
         setError(null);
 
         const response = await fetch(
-          `${APP_URL}api/v1/single-blog/${slug}?key=${APP_KEY}&type=featured`
+          `${APP_URL}api/v1/single-blog/${slug}?key=${APP_KEY}&type=featured`,
         );
 
         if (!response.ok) {
@@ -68,7 +67,7 @@ const BlogDetailPage = () => {
       const response = await fetch(
         `${APP_URL}api/v1/blogs?key=${APP_KEY}&type=featured${
           categoryId ? `&category=${categoryId}` : ""
-        }&limit=3`
+        }&limit=3`,
       );
 
       if (response.ok) {
@@ -175,6 +174,7 @@ const BlogDetailPage = () => {
   return (
     <>
       <Head>
+        {/* These meta tags will override the default ones from Layout */}
         <title>{blog.meta_title ? blog.meta_title : blog.title}</title>
         <meta
           name="description"
@@ -240,7 +240,9 @@ const BlogDetailPage = () => {
                 </nav>
 
                 <div className="text-center mb-5 mt-5">
-                  <h1 className="display-5 fw- mb-4 text-dark font-modernMTPro">{blog.title}</h1>
+                  <h1 className="display-5 fw- mb-4 text-dark font-modernMTPro">
+                    {blog.title}
+                  </h1>
 
                   <div className="d-flex justify-content-center align-items-center gap-4 text-muted mb-4">
                     <span className="d-flex align-items-center gap-2">
@@ -288,18 +290,6 @@ const BlogDetailPage = () => {
           <div className="container-fluid">
             <div className="row justify-content-center">
               <div className="col-lg-8">
-                {/* Short Description */}
-                {/* {blog.short_description && (
-                  <div className="short-description mb-5">
-                    <div
-                      className="lead fs-2 text-dark fw-bolder lh-base"
-                      dangerouslySetInnerHTML={{
-                        __html: blog.short_description,
-                      }}
-                    />
-                  </div>
-                )} */}
-
                 {/* Long Description */}
                 {blog.long_description && (
                   <div className="long-description mb-5">
@@ -329,27 +319,6 @@ const BlogDetailPage = () => {
                     </div>
                   </div>
                 )}
-
-                {/* Share Buttons */}
-                <div className="share-section border-top border-bottom py-4 my-5 d-none">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <span className="fw-semibold">Share this article:</span>
-                    <div className="d-flex gap-3">
-                      <button className="btn btn-outline-primary rounded-circle p-2">
-                        <i className="bi bi-facebook"></i>
-                      </button>
-                      <button className="btn btn-outline-info rounded-circle p-2">
-                        <i className="bi bi-twitter-x"></i>
-                      </button>
-                      <button className="btn btn-outline-danger rounded-circle p-2">
-                        <i className="bi bi-linkedin"></i>
-                      </button>
-                      <button className="btn btn-outline-success rounded-circle p-2">
-                        <i className="bi bi-whatsapp"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -360,7 +329,9 @@ const BlogDetailPage = () => {
             <div className="container">
               <div className="row">
                 <div className="col-12">
-                  <h2 className="mb-5 fw-bold text-center font-modernMTPro">Related Articles</h2>
+                  <h2 className="mb-5 fw-bold text-center font-modernMTPro">
+                    Related Articles
+                  </h2>
                 </div>
 
                 {loadingRelated ? (
@@ -426,7 +397,8 @@ const BlogDetailPage = () => {
                               href={`/blog/${relatedBlog.slug}`}
                               className="btn btn-link text-dark p-0 text-decoration-none font-modernMTPro"
                             >
-                              Read More <i className="fa fa-arrow-right ms-2"></i>
+                              Read More{" "}
+                              <i className="fa fa-arrow-right ms-2"></i>
                             </Link>
                           </div>
                         </div>
@@ -448,7 +420,7 @@ const BlogDetailPage = () => {
                   href="/blogs"
                   className="btn btn-outline-dark fw-normal px-4 py-2 font-modernMTPro"
                 >
-                   Back to All Blogs <i className="fa fa-arrow-left ms-2"></i>
+                  Back to All Blogs <i className="fa fa-arrow-left ms-2"></i>
                 </Link>
 
                 <button
@@ -457,7 +429,7 @@ const BlogDetailPage = () => {
                   }
                   className="btn btn-outline-dark fw-normal px-4 py-2 font-modernMTPro"
                 >
-                   Back to Top <i className="fa fa-arrow-up ms-2"></i> 
+                  Back to Top <i className="fa fa-arrow-up ms-2"></i>
                 </button>
               </div>
             </div>
@@ -473,8 +445,13 @@ const BlogDetailPage = () => {
           font-family: "romie-r";
         }
         .blog-detail-page {
-          font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-            Roboto, sans-serif;
+          font-family:
+            "Inter",
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Roboto,
+            sans-serif;
         }
 
         .featured-image-container {
@@ -498,7 +475,6 @@ const BlogDetailPage = () => {
           height: 500px;
           object-position: left;
           object-fit: contain;
-          // height: auto;
         }
         .content-styles h2,
         .content-styles h3,
@@ -537,26 +513,6 @@ const BlogDetailPage = () => {
           text-decoration: underline;
         }
 
-        .share-section .btn-outline-primary:hover {
-          background-color: #0d6efd;
-          color: white;
-        }
-
-        .share-section .btn-outline-info:hover {
-          background-color: #0dcaf0;
-          color: white;
-        }
-
-        .share-section .btn-outline-danger:hover {
-          background-color: #dc3545;
-          color: white;
-        }
-
-        .share-section .btn-outline-success:hover {
-          background-color: #198754;
-          color: white;
-        }
-
         @media (max-width: 768px) {
           .featured-image-container div {
             height: 300px !important;
@@ -582,6 +538,17 @@ const BlogDetailPage = () => {
       `}</style>
     </>
   );
+};
+
+// Server-side props for blog detail page
+BlogDetailPage.getInitialProps = async ({ query, req }) => {
+  const { slug } = query;
+
+  // You can add server-side fetching for blog data here if needed
+  // For now, we'll just return an empty object
+  return {
+    slug,
+  };
 };
 
 export default BlogDetailPage;
