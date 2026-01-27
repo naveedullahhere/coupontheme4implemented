@@ -43,16 +43,10 @@ const StoreDetailPage = ({ data, metas, setMetas, initialMetas, slug }) => {
         // Update metas with store data
         setMetas({
           ...metas,
-          title: `${json?.data?.store?.name ? json?.data?.store?.name + " Coupons & Promo Codes" : "Coupon & Promo Codes"}`,
-          metaTitle:
-            json?.data?.store?.seo_title ||
-            `${json?.data?.store?.name ? json?.data?.store?.name + " Coupons & Promo Codes" : "Coupon & Promo Codes"}`,
-          metaDescription:
-            json?.data?.store?.seo_description ||
-            `${json?.data?.store?.name || "Store"} coupon codes, promo codes and discounts`,
-          metaKeyword:
-            json?.data?.store?.meta_key ||
-            `${json?.data?.store?.name || "store"}, coupon codes, promo codes, discounts, deals`,
+          title: `${json?.data?.store?.seo_title ?? data?.meta?.title ?? data?.siteTitle ?? slug}`,
+          metaTitle: `${json?.data?.store?.seo_title ?? data?.meta?.title ?? data?.siteTitle ?? slug}`,
+          metaDescription: `${json?.data?.store?.seo_description ?? data?.meta?.description ?? data?.siteTitle ?? slug}`,
+          metaKeyword: `${json?.data?.store?.meta_key ?? data?.meta?.keywords ?? data?.siteTitle ?? slug}`,
         });
 
         setError(null);

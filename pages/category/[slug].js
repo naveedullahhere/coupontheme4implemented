@@ -35,16 +35,15 @@ const CategoryPage = ({ data, metas, setMetas, initialMetas, slug }) => {
       .then((json) => {
         setloading(false);
         setcatcard(json);
+        console.log(json.meta);
 
         // Update metas with category data
         setMetas({
           ...metas,
-          title: `${json?.name ? json?.name + " Coupons & Promo Codes" : "Coupon & Promo Codes"}`,
-          metaTitle: `${json?.name ? json?.name + " Coupons & Promo Codes" : "Coupon & Promo Codes"}`,
-          metaDescription: json?.description
-            ? json.description.replace(/<[^>]*>/g, "")
-            : `Find the best ${json?.name || "category"} coupon codes, promo codes and discounts`,
-          metaKeyword: `${json?.name || "category"}, coupon codes, promo codes, discounts, deals`,
+          title: json?.meta?.title ?? json?.name ?? slug ?? "Coupon & Promo Codes",
+            metaTitle: json?.meta?.title  ?? json?.name ?? slug ?? "Coupon & Promo Codes",
+            metaDescription: json?.meta?.description,
+          metaKeyword: json?.meta?.keywords || `${json?.meta?.title || json?.name || "category"}, coupon codes, promo codes, discounts, deals`,
         });
 
         if (json.success === false) {
@@ -139,12 +138,12 @@ CategoryPage.getInitialProps = async ({ query, req }) => {
         const categoryData = await response.json();
 
         initialMetas = {
-          title: `${categoryData?.name || slug} Coupons & Promo Codes`,
-          metaTitle: `${categoryData?.name || slug} Coupons & Promo Codes`,
-          metaDescription: categoryData?.description
-            ? categoryData.description.replace(/<[^>]*>/g, "")
-            : `Find the best ${categoryData?.name || slug} coupon codes, promo codes and discounts`,
-          metaKeyword: `${categoryData?.name || slug}, coupon codes, promo codes, discounts, deals`,
+          title: categoryData?.meta?.title || categoryData?.name || slug,
+          metaTitle: categoryData?.meta?.title || categoryData?.name || slug,
+          metaDescription: categoryData?.meta?.description || categoryData?.description
+            ? categoryData.meta?.description.replace(/<[^>]*>/g, "")
+            : `Find the best ${categoryData?.meta?.title || categoryData?.name || slug}`,
+          metaKeyword: categoryData?.meta?.keywords || `${categoryData?.meta?.title || categoryData?.name || slug}, coupon codes, promo codes, discounts, deals`,
         };
       } catch (apiError) {
         // Fallback if API fails
@@ -154,7 +153,7 @@ CategoryPage.getInitialProps = async ({ query, req }) => {
           .join(" ");
 
         initialMetas = {
-          title: `${formattedSlug} Coupons & Promo Codes`,
+          title: themeData?.siteTitle ? themeData?.siteTitle + " - " + formattedSlug : formattedSlug,
           metaTitle: `${formattedSlug} Coupons & Promo Codes`,
           metaDescription: `Find the best ${formattedSlug} coupon codes, promo codes and discounts`,
           metaKeyword: `${formattedSlug}, coupon codes, promo codes, discounts, deals`,

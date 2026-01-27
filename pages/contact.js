@@ -1,12 +1,26 @@
 'use client'
 
 import { APP_KEY, APP_URL } from '@/public/settings/there_is_nothing_holding_me_back/config'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
-export default function ContactPage({ data: { contact_detail } }) {
+export default function ContactPage({ data: { contact_detail,siteTitle,contact_us_meta }, setMetas, metas, initialMetas }) {
     const [isLoading, setIsLoading] = useState(false)
     console.log(contact_detail);
+    useEffect(() => {
+        if (initialMetas) {
+            setMetas(initialMetas);
+        }
+    }, [initialMetas, setMetas]);
+    useEffect(() => {
+        setMetas({
+            ...metas,
+            title: contact_us_meta?.title || `Contact Us ${siteTitle ? "- " + siteTitle : ""}`,
+            metaTitle: contact_us_meta?.title || `Contact Us ${siteTitle ? "- " + siteTitle : ""}`,
+            metaDescription: contact_us_meta?.description || `Contact Us ${siteTitle ? "- " + siteTitle : ""}`,
+            metaKeyword: contact_us_meta?.keywords || `Contact Us ${siteTitle ? "- " + siteTitle : ""}`,
+        });
+    }, [metas, setMetas]);
     const handleSubmit = async (e) => {
         e.preventDefault()
         setIsLoading(true)
