@@ -1,3 +1,4 @@
+// pages/index.js
 import Newcoupon from "@/components/Newcoupon";
 import Favorite from "@/components/Favoritebrands";
 import Couponslider from "@/components/Couponslider";
@@ -15,17 +16,25 @@ import { useEffect, useState } from "react";
 import Spinner from "@/components/Spinner";
 import CategoryWiseBlog from "@/components/CategoryWiseBlog";
 
-export default function Home({ data, setMetas, metas }) {
+export default function Home({ data, setMetas, metas, initialMetas }) {
   const [loading, setloading] = useState(true);
   const [homeData, setHomeData] = useState([]);
   const [err, seterr] = useState(null);
 
   useEffect(() => {
+    // Set initial metas from server-side
+    if (initialMetas) {
+      setMetas(initialMetas);
+    }
+  }, [initialMetas, setMetas]);
+
+  useEffect(() => {
+    // Client-side metas update
     setMetas({
       title: data?.siteTitle ? data?.siteTitle : "Home",
-      metaTitle: data?.meta ? data?.meta?.title : "",
-      metaDescription: `${data?.meta ? data?.meta?.description : ""}`,
-      metaKeyword: `${data?.meta ? data?.meta?.keywords : "Coupon Codes"}`,
+      metaTitle: data?.siteTitle ? data?.siteTitle : "Home",
+      metaDescription: `${data?.meta ? data?.meta?.description : "Find the best coupon codes, promo codes and discounts"}`,
+      metaKeyword: `${data?.meta ? data?.meta?.keywords : "coupon codes, promo codes, discounts, deals"}`,
     });
 
     fetch(`${APP_URL}api/home?key=${APP_KEY}`)
@@ -33,7 +42,7 @@ export default function Home({ data, setMetas, metas }) {
       .then((dta) => {
         setloading(false);
 
-        if (homeData.success === false) {
+        if (dta.success === false) {
           seterr("Something Went Wrong!");
         } else {
           setHomeData(dta?.data);
@@ -44,25 +53,13 @@ export default function Home({ data, setMetas, metas }) {
         setloading(false);
         seterr(err.message);
       });
-  }, []);
+  }, [data, setMetas]);
 
   if (loading)
     return (
-      <Layout
-        title={`${data?.siteTitle ? data?.siteTitle : "Home"}`}
-        metaTitle={`${data?.siteTitle ? data?.siteTitle : "Home"}`}
-        metaDescription={`${
-          data?.meta ? data?.meta?.description : "More Coupon Codes"
-        }`}
-        logo=""
-        metaKeywords={`${
-          data?.meta ? data?.meta?.keywords : "More Coupon Codes"
-        }`}
-      >
-        <div className="bg-white vh-100 vw-100 d-flex justify-content-center align-items-center">
-          <Spinner />
-        </div>
-      </Layout>
+      <div className="bg-white vh-100 vw-100 d-flex justify-content-center align-items-center">
+        <Spinner />
+      </div>
     );
   if (err)
     return (
@@ -97,3 +94,47 @@ export default function Home({ data, setMetas, metas }) {
     );
   }
 }
+
+// Server-side props for home page
+Home.getInitialProps = async ({ query, req }) => {
+  let themeData = null;
+  let initialMetas = null;
+
+  // Only fetch on server-side
+  if (typeof window === "undefined") {
+    try {
+      const fs = (await import("fs")).default;
+      const path = (await import("path")).default;
+
+      const filePath = path.join(
+        process.cwd(),
+        "public",
+        "settings",
+        "data.json"
+      );
+      const fileContents = fs.readFileSync(filePath, "utf8");
+      themeData = JSON.parse(fileContents);
+      
+      initialMetas = {
+        title: themeData?.siteTitle ? themeData?.siteTitle : "Home",
+        metaTitle: themeData?.siteTitle ? themeData?.siteTitle : "Home",
+        metaDescription: `${themeData?.meta ? themeData?.meta?.description : "Find the best coupon codes, promo codes and discounts"}`,
+        metaKeyword: `${themeData?.meta ? themeData?.meta?.keywords : "coupon codes, promo codes, discounts, deals"}`,
+      };
+    } catch (error) {
+      console.error("Error reading data.json on server:", error);
+      themeData = {};
+      initialMetas = {
+        title: "Home",
+        metaTitle: "Home",
+        metaDescription: "Find the best coupon codes, promo codes and discounts",
+        metaKeyword: "coupon codes, promo codes, discounts, deals"
+      };
+    }
+  }
+
+  return {
+    themeData,
+    initialMetas,
+  };
+};
