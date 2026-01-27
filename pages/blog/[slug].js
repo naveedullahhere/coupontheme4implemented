@@ -1,17 +1,23 @@
+// pages/blog/[slug].js
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
-import Head from "next/head";
 import {
   APP_KEY,
   APP_URL,
 } from "@/public/settings/there_is_nothing_holding_me_back/config";
 import Spinner from "@/components/Spinner";
 
-const BlogDetailPage = ({ themeData }) => {
+const BlogDetailPage = ({
+  data,
+  metas,
+  setMetas,
+  initialMetas,
+  slug: propSlug,
+}) => {
   const router = useRouter();
-  const { slug } = router.query;
+  const currentSlug = router?.query?.slug || propSlug;
 
   const [blog, setBlog] = useState(null);
   const [imageBaseUrl, setImageBaseUrl] = useState("");
@@ -20,9 +26,16 @@ const BlogDetailPage = ({ themeData }) => {
   const [relatedBlogs, setRelatedBlogs] = useState([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
 
+  useEffect(() => {
+    // Set initial metas from server-side
+    if (initialMetas) {
+      setMetas(initialMetas);
+    }
+  }, [initialMetas, setMetas]);
+
   // Fetch blog details
   useEffect(() => {
-    if (!slug) return;
+    if (!currentSlug) return;
 
     const fetchBlogDetails = async () => {
       try {
@@ -30,7 +43,7 @@ const BlogDetailPage = ({ themeData }) => {
         setError(null);
 
         const response = await fetch(
-          `${APP_URL}api/v1/single-blog/${slug}?key=${APP_KEY}&type=featured`,
+          `${APP_URL}api/v1/single-blog/${currentSlug}?key=${APP_KEY}&type=featured`,
         );
 
         if (!response.ok) {
@@ -42,6 +55,20 @@ const BlogDetailPage = ({ themeData }) => {
         if (result.success && result.data) {
           setBlog(result.data);
           setImageBaseUrl(result.url || "");
+
+          // Update metas with blog data
+          setMetas({
+            ...metas,
+            title: result.data.meta_title || result.data.title,
+            metaTitle: result.data.meta_title || result.data.title,
+            metaDescription:
+              result.data.meta_description ||
+              result.data.short_description?.replace(/<[^>]*>/g, ""),
+            metaKeyword:
+              result.data.meta_keyword ||
+              result.data.meta_key ||
+              result.data.title,
+          });
 
           // Fetch related blogs after getting current blog details
           fetchRelatedBlogs(result.data.category_id);
@@ -57,7 +84,7 @@ const BlogDetailPage = ({ themeData }) => {
     };
 
     fetchBlogDetails();
-  }, [slug]);
+  }, [currentSlug]);
 
   // Fetch related blogs
   const fetchRelatedBlogs = async (categoryId) => {
@@ -74,7 +101,7 @@ const BlogDetailPage = ({ themeData }) => {
         const result = await response.json();
         // Filter out current blog from related blogs
         const filtered =
-          result.data?.filter((item) => item.slug !== slug) || [];
+          result.data?.filter((item) => item.slug !== currentSlug) || [];
         setRelatedBlogs(filtered.slice(0, 2));
       }
     } catch (err) {
@@ -173,39 +200,6 @@ const BlogDetailPage = ({ themeData }) => {
 
   return (
     <>
-      <Head>
-        {/* These meta tags will override the default ones from Layout */}
-        <title>{blog.meta_title ? blog.meta_title : blog.title}</title>
-        <meta
-          name="description"
-          content={
-            blog.meta_description
-              ? blog.meta_description
-              : blog.short_description?.replace(/<[^>]*>/g, "")
-          }
-        />
-        <meta
-          name="keywords"
-          content={
-            blog.meta_keyword ? blog.meta_keyword : blog.meta_key || blog.title
-          }
-        />
-        <meta
-          property="og:title"
-          content={blog.meta_title ? blog.meta_title : blog.title}
-        />
-        <meta
-          property="og:description"
-          content={
-            blog.meta_description
-              ? blog.meta_description
-              : blog.short_description?.replace(/<[^>]*>/g, "")
-          }
-        />
-        <meta property="og:image" content={imageUrl} />
-        <meta property="og:type" content="article" />
-      </Head>
-
       <div className="blog-detail-page blogbg">
         {/* Hero Section */}
         <div className="blog-hero-section position-relative">
@@ -544,9 +538,80 @@ const BlogDetailPage = ({ themeData }) => {
 BlogDetailPage.getInitialProps = async ({ query, req }) => {
   const { slug } = query;
 
-  // You can add server-side fetching for blog data here if needed
-  // For now, we'll just return an empty object
+  let themeData = null;
+  let initialMetas = null;
+
+  // Only fetch on server-side
+  if (typeof window === "undefined") {
+    try {
+      const fs = (await import("fs")).default;
+      const path = (await import("path")).default;
+
+      const filePath = path.join(
+        process.cwd(),
+        "public",
+        "settings",
+        "data.json",
+      );
+      const fileContents = fs.readFileSync(filePath, "utf8");
+      themeData = JSON.parse(fileContents);
+
+      // Try to fetch blog data for meta tags
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/v1/single-blog/${slug}?key=${process.env.APP_KEY}&type=featured`,
+        );
+        const blogData = await response.json();
+
+        if (blogData.success && blogData.data) {
+          initialMetas = {
+            title: blogData.data.meta_title || blogData.data.title,
+            metaTitle: blogData.data.meta_title || blogData.data.title,
+            metaDescription:
+              blogData.data.meta_description ||
+              blogData.data.short_description?.replace(/<[^>]*>/g, ""),
+            metaKeyword:
+              blogData.data.meta_keyword ||
+              blogData.data.meta_key ||
+              blogData.data.title,
+          };
+        } else {
+          throw new Error("Blog not found");
+        }
+      } catch (apiError) {
+        // Fallback if API fails
+        const formattedSlug = slug
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+
+        initialMetas = {
+          title: formattedSlug,
+          metaTitle: formattedSlug,
+          metaDescription: `${formattedSlug} - Read our latest article`,
+          metaKeyword: `${formattedSlug}, blog, article`,
+        };
+      }
+    } catch (error) {
+      console.error("Error reading data.json on server:", error);
+      themeData = {};
+      const formattedSlug = slug
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+
+      initialMetas = {
+        title: formattedSlug,
+        metaTitle: formattedSlug,
+        metaDescription: `${formattedSlug} - Read our latest article`,
+        metaKeyword: `${formattedSlug}, blog, article`,
+      };
+    }
+  }
+
   return {
+    themeData,
+    initialMetas,
     slug,
   };
 };

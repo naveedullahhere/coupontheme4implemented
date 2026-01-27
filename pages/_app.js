@@ -1,3 +1,4 @@
+// pages/_app.js
 import "@/styles/globals.css";
 import Header1 from "@/components/layout/Header1";
 import Header2 from "@/components/layout/Header2";
@@ -21,43 +22,46 @@ const Toaster = dynamic(
   () => import("react-hot-toast").then((c) => c.Toaster),
   {
     ssr: false,
-  },
+  }
 );
 
-export default function App({ Component, pageProps, themeData, initialMetas }) {
+export default function App({ 
+  Component, 
+  pageProps,
+  themeData
+}) {
   const [data, setData] = useState(themeData || {});
   const [loading, setLoading] = useState(!themeData);
   const [err, setErr] = useState(false);
-  const [metas, setMetas] = useState(
-    initialMetas || {
-      title: "Home",
-      metaTitle: "",
-      metaDescription: "More Coupon Codes",
-      metaKeyword: "More Coupon Codes",
-    },
-  );
+  const [category, setCategory] = useState(themeData?.category || []);
+  const [season, setSeason] = useState(themeData?.season || []);
+  const [coupons, setCoupons] = useState(themeData?.type || []);
+  const [country, setCountry] = useState(themeData?.country || []);
+  
+  // Initialize metas from pageProps
+  const [metas, setMetas] = useState(pageProps.initialMetas || {
+    title: "Home",
+    metaTitle: "",
+    metaDescription: "More Coupon Codes",
+    metaKeyword: "More Coupon Codes",
+  });
 
   useEffect(() => {
-    // Only fetch on client-side if server-side data not available
-    if (!themeData && typeof window !== "undefined") {
+    if (!themeData && typeof window !== 'undefined') {
       async function fetchData() {
         try {
           setLoading(true);
           const response = await fetch("/settings/data.json");
           if (!response.ok) {
-            throw new Error("Failed to fetch data");
+            throw new Error('Failed to fetch data');
           }
           const theme = await response.json();
           setData(theme);
-
-          // Update metas based on fetched data
-          setMetas({
-            title: theme?.siteTitle ? theme?.siteTitle : "Home",
-            metaTitle: theme?.siteTitle ? theme?.siteTitle : "",
-            metaDescription: `${theme?.meta ? theme?.meta?.description : "More Coupon Codes"}`,
-            metaKeyword: `${theme?.meta ? theme?.meta?.keywords : "More Coupon Codes"}`,
-          });
-
+          setCategory(theme?.category || []);
+          setSeason(theme?.season || []);
+          setCoupons(theme?.type || []);
+          setCountry(theme?.country || []);
+          
           setLoading(false);
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -69,15 +73,16 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
     }
   }, [themeData]);
 
+  // Update metas when pageProps change
+  useEffect(() => {
+    if (pageProps.initialMetas) {
+      setMetas(pageProps.initialMetas);
+    }
+  }, [pageProps.initialMetas]);
+
   if (loading && !themeData) {
     return (
-      <Layout
-        title={`Loading...`}
-        metaTitle={`Loading...`}
-        metaDescription={`Loading...`}
-        logo=""
-        metaKeywords={`Loading...`}
-      >
+      <Layout>
         <div className="bg-white vh-100 vw-100 d-flex justify-content-center align-items-center">
           <Spinner />
         </div>
@@ -94,15 +99,62 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
   }
 
   const currentData = themeData || data;
+  const currentCategory = category;
+  const currentSeason = season;
+  const currentCoupons = coupons;
+  const currentCountry = country;
+  
+  // Favicon URL
+  const favicon = currentData?.logo?.favicon
+    ? `${currentData?.url}/${currentData.logo.favicon}`
+    : "/favicon.png";
 
   return (
     <>
-      {/* Main Layout component se pehle Head mein meta tags set karo */}
       <Head>
+        {/* Title */}
         <title>{metas.title}</title>
+        
+        {/* Basic Meta Tags */}
         <meta name="description" content={metas.metaDescription} />
         <meta name="keywords" content={metas.metaKeyword} />
-
+        
+        {/* Viewport */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        
+        {/* Favicon */}
+        <link rel="icon" type="image/png" sizes="32x32" href={favicon} />
+        <link rel="shortcut icon" href={favicon} />
+        <link rel="apple-touch-icon" href={favicon} />
+        <link rel="image_src" href={favicon} />
+        
+        {/* External CSS */}
+        <link href="/css/fontawesome-all.css" rel="stylesheet" />
+        <link href="/css/flaticon.css" rel="stylesheet" />
+        <link href="/bootstrap.min.css" rel="stylesheet" />
+        
+        {/* OG Tags */}
+        <meta property="og:title" content={metas.metaTitle || metas.title} />
+        <meta property="og:description" content={metas.metaDescription} />
+        <meta property="og:image" content={favicon} />
+        <meta property="og:type" content="website" />
+        
+        {/* Twitter Cards */}
+        <meta name="twitter:title" content={metas.metaTitle || metas.title} />
+        <meta name="twitter:description" content={metas.metaDescription} />
+        
+        {/* Canonical */}
+        <link rel="canonical" href="https://helloluvvy.com" />
+        
+        {/* Additional OG Tags */}
+        <meta property="og:site_name" content={metas.metaTitle || metas.title} />
+        <meta property="og:url" content="https://helloluvvy.com" />
+        <meta property="og:image:type" content="image/png" />
+        
+        {/* Google Verification */}
+        <meta name="google-site-verification" content="DlPj7CVm0pxZExMMnC37egWVigS0ZQf9_nfvNAY9E0Q" />
+        
+        {/* Head Scripts */}
         {currentData?.head_scripts && (
           <script
             dangerouslySetInnerHTML={{
@@ -122,8 +174,7 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
             --secondary: ${currentData?.color?.secondary || "#1b96b8"};
             --header: ${currentData?.header?.background || "blue"};
             --header-text: ${currentData?.header?.color || "white"};
-            --header-btn-bg: ${currentData?.header?.button_background ||
-            "white"};
+            --header-btn-bg: ${currentData?.header?.button_background || "white"};
             --header-btn-text: ${currentData?.header?.button_color || "white"};
             --footer-bg: ${currentData?.footer?.background || "blue"};
             --footer-text: ${currentData?.footer?.color || "white"};
@@ -143,40 +194,35 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
           CONTAINER_TYPE === "wide" ? "wide" : "none-wide"
         }`}
       >
-        {/* Layout component ko simplified props do */}
         <Layout
-          title={metas.title}
-          metaTitle={metas.metaTitle}
-          metaDescription={metas.metaDescription}
-          logo=""
-          metaKeywords={metas.metaKeyword}
           themeData={currentData}
+          favicon={favicon}
         >
           {currentData?.Style === 1 && (
             <Header1
               data={currentData}
-              category={currentData?.category}
-              season={currentData?.season}
-              coupons={currentData?.type}
-              country={currentData?.country}
+              category={currentCategory}
+              season={currentSeason}
+              coupons={currentCoupons}
+              country={currentCountry}
             />
           )}
           {currentData?.Style === 2 && (
             <Header2
               data={currentData}
-              category={currentData?.category}
-              season={currentData?.season}
-              coupons={currentData?.type}
-              country={currentData?.country}
+              category={currentCategory}
+              season={currentSeason}
+              coupons={currentCoupons}
+              country={currentCountry}
             />
           )}
           {currentData?.Style === 4 && (
             <Header4
               data={currentData}
-              category={currentData?.category}
-              season={currentData?.season}
-              coupons={currentData?.type}
-              country={currentData?.country}
+              category={currentCategory}
+              season={currentSeason}
+              coupons={currentCoupons}
+              country={currentCountry}
             />
           )}
           <div className={`min-vh-90`}>
@@ -185,37 +231,39 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
               data={currentData}
               metas={metas}
               setMetas={setMetas}
+              category={currentCategory}
+              season={currentSeason}
+              coupons={currentCoupons}
+              country={currentCountry}
             />
           </div>
           <Toaster position="top-right" />
           {currentData?.Style === 1 && (
             <Footer1
               data={currentData}
-              category={currentData?.category}
-              season={currentData?.season}
-              coupons={currentData?.type}
-              country={currentData?.country}
+              category={currentCategory}
+              season={currentSeason}
+              coupons={currentCoupons}
+              country={currentCountry}
             />
           )}
           {currentData?.Style === 2 && (
             <Footer2
               data={currentData}
-              category={currentData?.category}
-              season={currentData?.season}
-              coupons={currentData?.type}
-              country={currentData?.country}
+              category={currentCategory}
+              season={currentSeason}
+              coupons={currentCoupons}
+              country={currentCountry}
             />
           )}
           {currentData?.Style === 4 && (
-            <>
-              <Footer4
-                data={currentData}
-                category={currentData?.category}
-                season={currentData?.season}
-                coupons={currentData?.type}
-                country={currentData?.country}
-              />
-            </>
+            <Footer4
+              data={currentData}
+              category={currentCategory}
+              season={currentSeason}
+              coupons={currentCoupons}
+              country={currentCountry}
+            />
           )}
         </Layout>
       </div>
@@ -227,40 +275,19 @@ export default function App({ Component, pageProps, themeData, initialMetas }) {
 App.getInitialProps = async ({ Component, ctx }) => {
   let pageProps = {};
   let themeData = null;
-  let initialMetas = null;
 
   // Only fetch on server-side
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     try {
-      // Dynamic import for fs module (only on server)
-      const fs = (await import("fs")).default;
-      const path = (await import("path")).default;
-
-      const filePath = path.join(
-        process.cwd(),
-        "public",
-        "settings",
-        "data.json",
-      );
-      const fileContents = fs.readFileSync(filePath, "utf8");
+      const fs = (await import('fs')).default;
+      const path = (await import('path')).default;
+      
+      const filePath = path.join(process.cwd(), 'public', 'settings', 'data.json');
+      const fileContents = fs.readFileSync(filePath, 'utf8');
       themeData = JSON.parse(fileContents);
-
-      initialMetas = {
-        title: themeData?.siteTitle ? themeData?.siteTitle : "Home",
-        metaTitle: themeData?.siteTitle ? themeData?.siteTitle : "",
-        metaDescription: `${themeData?.meta ? themeData?.meta?.description : "More Coupon Codes"}`,
-        metaKeyword: `${themeData?.meta ? themeData?.meta?.keywords : "More Coupon Codes"}`,
-      };
     } catch (error) {
       console.error("Error reading data.json on server:", error);
-      // Fallback to empty data
       themeData = {};
-      initialMetas = {
-        title: "Home",
-        metaTitle: "",
-        metaDescription: "More Coupon Codes",
-        metaKeyword: "More Coupon Codes",
-      };
     }
   }
 
@@ -271,6 +298,5 @@ App.getInitialProps = async ({ Component, ctx }) => {
   return {
     pageProps,
     themeData,
-    initialMetas,
   };
 };

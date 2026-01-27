@@ -1,3 +1,4 @@
+// pages/blogs/index.js
 import React, { useState, useEffect, useCallback } from "react";
 import Head from "next/head";
 import Link from "next/link";
@@ -9,10 +10,8 @@ import {
 } from "@/public/settings/there_is_nothing_holding_me_back/config";
 import Spinner from "@/components/Spinner";
 
-const BlogsPage = ({ categoryParam, themeData }) => {
+const BlogsPage = ({ data, metas, setMetas }) => {
   const router = useRouter();
-  const { category: categorySlug } = router.query;
-  const actualCategorySlug = categorySlug || categoryParam;
 
   const [blogs, setBlogs] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -29,6 +28,19 @@ const BlogsPage = ({ categoryParam, themeData }) => {
   const [selectedCategoryName, setSelectedCategoryName] = useState("");
   const [hasInitialized, setHasInitialized] = useState(false);
   const [categoriesWithBlogs, setCategoriesWithBlogs] = useState([]);
+
+  // Update metas when category changes
+  useEffect(() => {
+    if (selectedCategoryName && typeof setMetas === "function") {
+      const newMetas = {
+        title: `${selectedCategoryName} | Blog Category`,
+        metaTitle: `${selectedCategoryName} | Blog Category`,
+        metaDescription: `Explore all articles in ${selectedCategoryName} category`,
+        metaKeyword: `${selectedCategoryName}, blog, articles, insights`,
+      };
+      setMetas(newMetas);
+    }
+  }, [selectedCategoryName, setMetas]);
 
   // Fetch filter options (categories and tags)
   useEffect(() => {
@@ -86,45 +98,17 @@ const BlogsPage = ({ categoryParam, themeData }) => {
             };
 
             checkCategoriesWithBlogs();
-
-            if (actualCategorySlug) {
-              const categorySlugStr = Array.isArray(actualCategorySlug)
-                ? actualCategorySlug[0]
-                : actualCategorySlug;
-
-              const categoryFromSlug = categoriesData.find(
-                (cat) =>
-                  cat.slug === categorySlugStr ||
-                  cat.id.toString() === categorySlugStr,
-              );
-
-              if (categoryFromSlug) {
-                setSelectedCategories([categoryFromSlug.id]);
-                setSelectedCategoryName(categoryFromSlug.name);
-              } else {
-                setSelectedCategories([]);
-                setSelectedCategoryName("");
-              }
-            } else {
-              setSelectedCategories([]);
-              setSelectedCategoryName("");
-            }
-
             setHasInitialized(true);
-            setLoading(false); // ✅ Loading complete
           }
-        } else {
-          setLoading(false);
         }
       } catch (err) {
         console.error("Error fetching filter options:", err);
         setHasInitialized(true);
-        setLoading(false);
       }
     };
 
     fetchFilterOptions();
-  }, [actualCategorySlug]);
+  }, []);
 
   // Fetch blogs with filters
   const fetchBlogs = useCallback(async () => {
@@ -132,6 +116,7 @@ const BlogsPage = ({ categoryParam, themeData }) => {
 
     try {
       setLoadingBlogs(true);
+      setBlogs([]);
 
       let apiUrl = `${APP_URL}api/v1/blogs?key=${APP_KEY}&type=featured&page=${currentPage}`;
 
@@ -173,6 +158,7 @@ const BlogsPage = ({ categoryParam, themeData }) => {
       setTotalPages(1);
       setTotalBlogs(0);
     } finally {
+      setLoading(false);
       setLoadingBlogs(false);
     }
   }, [
@@ -196,7 +182,6 @@ const BlogsPage = ({ categoryParam, themeData }) => {
     searchQuery,
     hasInitialized,
     categories.length,
-    fetchBlogs,
   ]);
 
   // Handle category selection
@@ -283,7 +268,7 @@ const BlogsPage = ({ categoryParam, themeData }) => {
     setCurrentPage(1);
   };
 
-  if (loading) {
+  if (loading && !hasInitialized) {
     return (
       <div className="min-vh-100 d-flex justify-content-center align-items-center">
         <Spinner size="lg" />
@@ -293,23 +278,6 @@ const BlogsPage = ({ categoryParam, themeData }) => {
 
   return (
     <>
-      <Head>
-        {/* Page-specific meta tags */}
-        <title>
-          {selectedCategoryName
-            ? `${selectedCategoryName} | Blog Category`
-            : "Blogs | Our Articles & Insights"}
-        </title>
-        <meta
-          name="description"
-          content="Explore our collection of insightful articles, tips, and guides on various topics."
-        />
-        <meta
-          name="keywords"
-          content="blog, articles, insights, guides, tips"
-        />
-      </Head>
-
       <div className="blogs-page py-5 blogbg">
         <div className="container-fluid">
           <div className="row">
@@ -343,6 +311,7 @@ const BlogsPage = ({ categoryParam, themeData }) => {
                   </form>
                 </div>
 
+                {/* Active Filters */}
                 {(selectedCategories.length > 0 || selectedTags.length > 0) && (
                   <div className="mb-5">
                     <div className="d-flex justify-content-between align-items-center mb-3">
@@ -389,6 +358,7 @@ const BlogsPage = ({ categoryParam, themeData }) => {
                   </div>
                 )}
 
+                {/* Categories */}
                 {(() => {
                   const categoriesToShow = [...categoriesWithBlogs];
                   if (selectedCategories.length > 0) {
@@ -435,6 +405,7 @@ const BlogsPage = ({ categoryParam, themeData }) => {
                   ) : null;
                 })()}
 
+                {/* Tags */}
                 {tags.length > 0 && (
                   <div className="mb-4">
                     <h5 className="font-modernMTPro mb-3 text-dark">Tags</h5>
@@ -461,6 +432,7 @@ const BlogsPage = ({ categoryParam, themeData }) => {
 
             {/* Blogs Grid */}
             <div className="col-lg-9">
+              {/* Results Header */}
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
                   <h2 className="h2  mb-2 font-modernMTPro">
@@ -482,6 +454,7 @@ const BlogsPage = ({ categoryParam, themeData }) => {
                 )}
               </div>
 
+              {/* Blogs Grid */}
               {loadingBlogs ? (
                 <div className="text-center py-5">
                   <Spinner />
@@ -569,6 +542,7 @@ const BlogsPage = ({ categoryParam, themeData }) => {
                     })}
                   </div>
 
+                  {/* Pagination */}
                   {totalPages > 1 && (
                     <nav
                       aria-label="Blog pagination"
@@ -775,11 +749,10 @@ const BlogsPage = ({ categoryParam, themeData }) => {
   );
 };
 
-// Server-side props for blogs page
+// Server-side props for main blogs page
 BlogsPage.getInitialProps = async ({ query, req }) => {
-  const { category } = query;
-
   let themeData = null;
+  let initialMetas = null;
 
   // Only fetch on server-side
   if (typeof window === "undefined") {
@@ -795,15 +768,31 @@ BlogsPage.getInitialProps = async ({ query, req }) => {
       );
       const fileContents = fs.readFileSync(filePath, "utf8");
       themeData = JSON.parse(fileContents);
+
+      // Default metas for main blogs page
+      initialMetas = {
+        title: "Blogs | Our Articles & Insights",
+        metaTitle: "Blogs | Our Articles & Insights",
+        metaDescription:
+          "Explore our collection of insightful articles, tips, and guides on various topics.",
+        metaKeyword: "blog, articles, insights, guides, tips",
+      };
     } catch (error) {
       console.error("Error reading data.json on server:", error);
       themeData = {};
+      initialMetas = {
+        title: "Blogs | Our Articles & Insights",
+        metaTitle: "Blogs | Our Articles & Insights",
+        metaDescription:
+          "Explore our collection of insightful articles, tips, and guides on various topics.",
+        metaKeyword: "blog, articles, insights, guides, tips",
+      };
     }
   }
 
   return {
-    categoryParam: category || null,
     themeData,
+    initialMetas,
   };
 };
 

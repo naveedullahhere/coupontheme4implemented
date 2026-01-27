@@ -1,66 +1,185 @@
+// pages/stores/index.js
+import { useEffect, useState } from "react";
+import StoreItem from "@/components/StoreItem";
+import Pagination from "@/components/layout/Pagnation";
+import {
+  APP_URL,
+  APP_KEY,
+} from "@/public/settings/there_is_nothing_holding_me_back/config";
+import Spinner from "@/components/Spinner";
+import Head from "next/head";
 
-import { useEffect, useState } from 'react'
-import StoreItem from '@/components/StoreItem'
-import Pagination from '@/components/layout/Pagnation'
-import { APP_URL, APP_KEY } from '@/public/settings/there_is_nothing_holding_me_back/config'
-import Spinner from '@/components/Spinner'
+const StoresPage = ({ data, setMetas, metas, initialMetas }) => {
+  const [allstore, setAllStore] = useState({});
+  const [err, setError] = useState(false);
+  const [loading, setloading] = useState(false);
 
-const index = ({ data, setMetas, metas }) => {
+  useEffect(() => {
+    fetchStores();
+  }, []);
 
-    const [allstore, setAllStore] = useState({});
-    const [err, setError] = useState(false);
-    const [loading, setloading] = useState(false);
-
-
-    useEffect(() => {
-        fetchStores();
-    }, []);
-
-
-    const fetchStores = () => {
-        setloading(true);
-        fetch(`${APP_URL}api/store?key=${APP_KEY}&type=featured`).then(res => res.json()).then((itm) => {
-            setAllStore(itm);
-            setloading(false);
-            setMetas({ ...metas, title: `All Stores ${data?.siteTitle ? '- ' + data?.siteTitle : ''}` })
-        }).catch(err => {
-            setloading(false);
-            setError(true);
-        });
+  useEffect(() => {
+    // Set initial metas from server-side
+    if (initialMetas) {
+      setMetas(initialMetas);
     }
+  }, [initialMetas, setMetas]);
 
-    const words = [
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-    ]
+  const fetchStores = () => {
+    setloading(true);
+    fetch(`${APP_URL}api/store?key=${APP_KEY}&type=featured`)
+      .then((res) => res.json())
+      .then((itm) => {
+        setAllStore(itm);
+        setloading(false);
+        setMetas({
+          ...metas,
+          title: `All Stores ${data?.siteTitle ? "- " + data?.siteTitle : ""}`,
+          metaTitle: `All Stores ${data?.siteTitle ? "- " + data?.siteTitle : ""}`,
+          metaDescription: `Browse all stores and find the best coupon codes, promo codes and discounts`,
+          metaKeyword: `stores, coupon codes, promo codes, discounts, deals`,
+        });
+      })
+      .catch((err) => {
+        setloading(false);
+        setError(true);
+      });
+  };
 
-    if (loading) return <div className='bg-white vh-100 vw-100 d-flex justify-content-center overflow-hidden align-items-center position-fixed top-0 start-0 z-1'><Spinner /></div>
+  const words = [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
+  ];
 
+  if (loading)
     return (
-        <>
-            <div className="min-vh-100">
-                {err ? "Something Went Wrong" :
-                    <div className="container">
-                        <div className="">
-                            <h3 className='ps-0 my-3'>Browse Your Coupon By Store</h3>
-                            <div className='ps-0'>
-                                <Pagination words={words} />
-                            </div>
-                        </div>
-                        <div className="row my-5 w-100 mx-auto">
-                            {words?.map((itm) => <>
-                                <div class="col-12 page-link" id={`${itm}`}>
-                                    <div className='browse-coupon'> {allstore?.data?.filter(item => item?.name?.charAt(0).toLowerCase() === itm.toLowerCase())?.length ? itm : ''}</div>
-                                </div>
-                                {allstore?.data?.filter(item => item?.name?.charAt(0).toLowerCase() === itm.toLowerCase())?.flat()?.map(dta => <StoreItem cols={true} allStorez={true} head={true} item={dta} styledata={data} img={allstore?.url} />)}
-                            </>
-                            )}
-                        </div>
+      <div className="bg-white vh-100 vw-100 d-flex justify-content-center overflow-hidden align-items-center position-fixed top-0 start-0 z-1">
+        <Spinner />
+      </div>
+    );
 
-                    </div>
-                }
+  return (
+    <>
+      <div className="min-vh-100">
+        {err ? (
+          "Something Went Wrong"
+        ) : (
+          <div className="container">
+            <div className="">
+              <h3 className="ps-0 my-3">Browse Your Coupon By Store</h3>
+              <div className="ps-0">
+                <Pagination words={words} />
+              </div>
             </div>
-        </>
-    )
-}
+            <div className="row my-5 w-100 mx-auto">
+              {words?.map((itm) => (
+                <>
+                  <div className="col-12 page-link" id={`${itm}`}>
+                    <div className="browse-coupon">
+                      {" "}
+                      {allstore?.data?.filter(
+                        (item) =>
+                          item?.name?.charAt(0).toLowerCase() ===
+                          itm.toLowerCase(),
+                      )?.length
+                        ? itm
+                        : ""}
+                    </div>
+                  </div>
+                  {allstore?.data
+                    ?.filter(
+                      (item) =>
+                        item?.name?.charAt(0).toLowerCase() ===
+                        itm.toLowerCase(),
+                    )
+                    ?.flat()
+                    ?.map((dta) => (
+                      <StoreItem
+                        cols={true}
+                        allStorez={true}
+                        head={true}
+                        item={dta}
+                        styledata={data}
+                        img={allstore?.url}
+                      />
+                    ))}
+                </>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
 
-export default index
+// Server-side props
+StoresPage.getInitialProps = async ({ query, req }) => {
+  let themeData = null;
+  let initialMetas = null;
+
+  // Only fetch on server-side
+  if (typeof window === "undefined") {
+    try {
+      const fs = (await import("fs")).default;
+      const path = (await import("path")).default;
+
+      const filePath = path.join(
+        process.cwd(),
+        "public",
+        "settings",
+        "data.json",
+      );
+      const fileContents = fs.readFileSync(filePath, "utf8");
+      themeData = JSON.parse(fileContents);
+
+      initialMetas = {
+        title: `All Stores ${themeData?.siteTitle ? "- " + themeData?.siteTitle : ""}`,
+        metaTitle: `All Stores ${themeData?.siteTitle ? "- " + themeData?.siteTitle : ""}`,
+        metaDescription: `Browse all stores and find the best coupon codes, promo codes and discounts`,
+        metaKeyword: `stores, coupon codes, promo codes, discounts, deals`,
+      };
+    } catch (error) {
+      console.error("Error reading data.json on server:", error);
+      themeData = {};
+      initialMetas = {
+        title: "All Stores",
+        metaTitle: "All Stores",
+        metaDescription:
+          "Browse all stores and find the best coupon codes, promo codes and discounts",
+        metaKeyword: "stores, coupon codes, promo codes, discounts, deals",
+      };
+    }
+  }
+
+  return {
+    themeData,
+    initialMetas,
+  };
+};
+
+export default StoresPage;
