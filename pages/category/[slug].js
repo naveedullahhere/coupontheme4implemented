@@ -42,8 +42,8 @@ const CategoryPage = ({ data, metas, setMetas, initialMetas, slug }) => {
           ...metas,
           title: json?.meta?.title ?? json?.name ?? slug ?? "Coupon & Promo Codes",
             metaTitle: json?.meta?.title  ?? json?.name ?? slug ?? "Coupon & Promo Codes",
-            metaDescription: json?.meta?.description,
-          metaKeyword: json?.meta?.keywords || `${json?.meta?.title || json?.name || "category"}, coupon codes, promo codes, discounts, deals`,
+            metaDescription: json?.meta?.description ?? data?.meta?.description ?? data?.siteTitle ?? slug,
+          metaKeyword: json?.meta?.keywords ?? data?.meta?.keywords ?? data?.siteTitle ?? slug,
         });
 
         if (json.success === false) {
@@ -133,17 +133,15 @@ CategoryPage.getInitialProps = async ({ query, req }) => {
       // Fetch category name from API to set proper meta tags
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/proxy-category?slug=${slug}`,
+          `${APP_URL}api/store?key=${APP_KEY}&category=${slug}`,
         );
         const categoryData = await response.json();
 
         initialMetas = {
-          title: categoryData?.meta?.title || categoryData?.name || slug,
-          metaTitle: categoryData?.meta?.title || categoryData?.name || slug,
-          metaDescription: categoryData?.meta?.description || categoryData?.description
-            ? categoryData.meta?.description.replace(/<[^>]*>/g, "")
-            : `Find the best ${categoryData?.meta?.title || categoryData?.name || slug}`,
-          metaKeyword: categoryData?.meta?.keywords || `${categoryData?.meta?.title || categoryData?.name || slug}, coupon codes, promo codes, discounts, deals`,
+          title: categoryData?.meta?.title ?? categoryData?.name ?? slug ?? "Coupon & Promo Codes",
+          metaTitle: categoryData?.meta?.title ?? categoryData?.name  ?? data?.meta?.title ?? data?.siteTitle ?? slug ?? "Coupon & Promo Codes",
+          metaDescription: categoryData?.meta?.description ?? categoryData?.description ?? data?.meta?.description ?? data?.siteTitle ?? slug,
+          metaKeyword: categoryData?.meta?.keywords  ?? data?.meta?.keywords ?? data?.siteTitle ?? slug,
         };
       } catch (apiError) {
         // Fallback if API fails

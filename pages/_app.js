@@ -11,12 +11,14 @@ import {
   APP_URL,
   APP_KEY,
   CONTAINER_TYPE,
+  NEXT_PUBLIC_APP_URL,
 } from "@/public/settings/there_is_nothing_holding_me_back/config";
 import Spinner from "@/components/Spinner";
 import Header4 from "@/components/layout/Header4";
 import Footer4 from "@/components/layout/Footer4";
 import "@/public/fonts/font-dec.css";
 import Head from "next/head";
+import { useRouter } from "next/router"; // 👈 IMPORTANT
 
 const Toaster = dynamic(
   () => import("react-hot-toast").then((c) => c.Toaster),
@@ -30,6 +32,13 @@ export default function App({
   pageProps,
   themeData
 }) {
+
+  const router = useRouter(); // 👈 IMPORTANT
+console.log(router.asPath);
+  // 🔥 CANONICAL URL (query params removed)
+  const cleanPath = router.asPath.split("?")[0];
+  const canonicalUrl = `${NEXT_PUBLIC_APP_URL}${cleanPath === "/" ? "" : cleanPath}`;
+
   const [data, setData] = useState(themeData || {});
   const [loading, setLoading] = useState(!themeData);
   const [err, setErr] = useState(false);
@@ -142,13 +151,13 @@ export default function App({
         {/* Twitter Cards */}
         <meta name="twitter:title" content={metas.metaTitle || metas.title} />
         <meta name="twitter:description" content={metas.metaDescription} />
-        
+
         {/* Canonical */}
-        <link rel="canonical" href="https://helloluvvy.com" />
+        <link rel="canonical" href={canonicalUrl} />
         
         {/* Additional OG Tags */}
         <meta property="og:site_name" content={metas.metaTitle || metas.title} />
-        <meta property="og:url" content="https://helloluvvy.com" />
+        <meta property="og:url" content={canonicalUrl} />
         <meta property="og:image:type" content="image/png" />
         
         {/* Google Verification */}
